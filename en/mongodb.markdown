@@ -50,8 +50,8 @@ As you read through this, I encourage you to play with MongoDB to replicate what
 
 3. Create a new text file in the `bin` subfolder named `mongodb.config`.
 
-4. Add a single line to your mongodb.config:  
-       `dbpath=PATH_TO_WHERE_YOU_WANT_TO_STORE_YOUR_DB_FILES`  
+4. Add a single line to your mongodb.config:
+       `dbpath=PATH_TO_WHERE_YOU_WANT_TO_STORE_YOUR_DB_FILES`
    For example, on Windows use `dbpath=c:\mongodb\data` and on Linux `dbpath=/var/lib/mongodb/data`.
 
 5. Make sure the `dbpath` you specified exists.
@@ -60,13 +60,13 @@ As you read through this, I encourage you to play with MongoDB to replicate what
 
 As an example for Windows users, if you extracted the downloaded file to `c:\mongodb\` and you created `c:\mongodb\data\` then within `c:\mongodb\bin\mongodb.config` you would specify `dbpath=c:\mongodb\data\`. You could then launch `mongod` from a command prompt via `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
 
-Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths.
+Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths. TODO (brew on Mac?)
 
-Hopefully you now have MongoDB up and running. If you get an error, read the output carefully - the server is quite good at explaining what's wrong. 
+Hopefully you now have MongoDB up and running. If you get an error, read the output carefully - the server is quite good at explaining what's wrong.
 
 You can now launch `mongo` (without the *d*) which will connect a shell to your running server. Try entering `db.version()` to make sure everything's working as it should. Hopefully you'll see the version number you installed.
 
-If you can't, or don't want to install `mongod` locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster. 
+If you can't, or don't want to install `mongod` locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
 
 If you prefer GUI to command line shell, you can use [MongoDB Compass](URL TODO), an open source GUI for MongoDB.
 
@@ -562,7 +562,7 @@ The message from this chapter is that MongoDB, in most cases, can replace a rela
 ## Aggregation Pipeline ##
 Aggregation pipeline gives you a way to transform and combine documents in your collection.  You do it by passing the documents through a pipeline that's somewhat analogous to the Unix "pipe" where you send output from one command to another to a third, etc.
 
-The simplest aggregation you are probably already familiar with is the SQL `group by` expression.  We already saw the simple `count()`  method, but what if we want to see how many unicorns are male and how many are female?  
+The simplest aggregation you are probably already familiar with is the SQL `group by` expression.  We already saw the simple `count()`  method, but what if we want to see how many unicorns are male and how many are female?
 
 	db.unicorns.aggregate([{$group:{_id:'$gender',
 		total: {$sum:1}}}])
