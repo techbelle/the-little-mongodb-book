@@ -8,9 +8,13 @@
 \defaultfontfeatures{Scale = MatchLowercase}
 
 %% Fonts
-\setmainfont[Ligatures=TeX]{Verdana}
-\setsansfont[Ligatures=TeX]{Verdana}
-\setmonofont{Consolas}
+%% \setmainfont[Ligatures=TeX]{Linux Libertine}
+\setmainfont{Helvetica}
+\setsansfont{Tahoma}
+\setmonofont{Courier}
+%% \setmainfont[Ligatures=TeX]{Verdana}
+%% \setsansfont[Ligatures=TeX]{Verdana}
+%% \setmonofont{Consolas}
 
 %% Set Sans font in headings
 \usepackage{sectsty}
@@ -53,16 +57,18 @@
 \definecolor{Aluminium1}{HTML}{EEEEEC}
 \definecolor{Aluminium6}{HTML}{2e3436}
 
-\definecolor{Black}{HTML}{000000}
+%% \definecolor{Black}{HTML}{000000}
+\definecolor{Black}{HTML}{1A1A1A}
 
 
 % Listings
 \usepackage{upquote}
 
 \usepackage{listings}
+\newcommand{\passthrough}[1]{#1}
 
 \lstdefinelanguage{JavaScript}{
-  keywords = {typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywords = {typeof, new, true, false, catch, function, return, null, catch, switch, if, in, while, do, else, case, break},
   keywordstyle = \color{SkyBlue}\bfseries,
   ndkeywords = {class, export, boolean, throw, implements, import, this},
   ndkeywordstyle = \color{Aluminium6}\bfseries,

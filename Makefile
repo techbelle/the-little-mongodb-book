@@ -3,8 +3,9 @@ BOOK_FILE_NAME = mongodb
 
 PDF_BUILDER = pandoc
 PDF_BUILDER_FLAGS = \
-	--latex-engine xelatex \
+	--pdf-engine xelatex \
 	--template ../common/pdf-template.tex \
+        --top-level-division=section \
 	--listings
 
 EPUB_BUILDER = pandoc
