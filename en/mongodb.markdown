@@ -43,37 +43,23 @@ Having said all of that, the first thing we ought to do is explain what is meant
 You might be wondering where MongoDB fits into all of this. As a document-oriented database, MongoDB is a more generalized NoSQL solution. It should be viewed as an alternative to relational databases. Like relational databases, it too can benefit from being paired with some of the more specialized NoSQL solutions. MongoDB has advantages and drawbacks, which we'll cover in later parts of this book.
 
 # Getting Started #
-Most of this book will focus on core MongoDB functionality. We'll therefore rely on the MongoDB shell. While the shell is useful to learn as well as being a useful administrative tool, your code will use a MongoDB driver.
+Most of this book will focus on core MongoDB functionality. We'll therefore rely on the MongoDB shell. While the shell is useful to learn, your code will use a MongoDB driver.
 
 This does bring up the first thing you should know about MongoDB: its drivers. MongoDB has a [number of official drivers](http://docs.mongodb.org/ecosystem/drivers/) for various languages. These drivers can be thought of as the various database drivers you are probably already familiar with. On top of these drivers, the development community has built more language/framework-specific libraries. For example, [MongoMapper](https://github.com/jnunemaker/mongomapper) is a Ruby library which is ActiveRecord-friendly and [Motor](https://motor.readthedocs.io/en/stable/index.html) is an asynchronous Python driver which works with Tornado or asyncio. Whether you choose to program directly against the core MongoDB drivers or some higher-level library is up to you. I point this out only because many people new to MongoDB are confused as to why there are both official drivers and community libraries - the former generally focuses on core communication/connectivity with MongoDB and the latter with more language and framework-specific implementations.
 
-As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that you might come up with on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up.
+As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that you might come up with on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up.  You'll need to have a MongoDB server running somewhere, as well as a MongoDB client (shell or GUI) running locally.
 
-1. Head over to the [official download page](https://www.mongodb.com/download-center/community) and grab the binaries for your operating system of choice.
+First, install either MongoDB Shell from [the official page](https://www.mongodb.com/docs/mongodb-shell/) or if you prefer GUI to command line shell, you can use [MongoDB Compass](https://www.mongodb.com/try/download/compass), an open source GUI for MongoDB.  MongoDB Compass has the shell built-in so you can switch between using GUI and command line as you wish.
 
-2. Extract the archive (wherever you want) and navigate to the `bin` subfolder. Don't execute anything just yet, but know that `mongod` is the server process and `mongo` is the client shell - these are the two executables we'll be spending most of our time with.
+If you don't want to (or can't) install MongoDB server locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
 
-3. Create a new text file in the `bin` subfolder named `mongodb.config`.
+If you can run MongoDB locally and prefer to do that, follow instructions for your operating system on the [official installation manual page](https://www.mongodb.com/docs/manual/administration/install-community/).
 
-4. Add a single line to your mongodb.config:
-       `dbpath=PATH_TO_WHERE_YOU_WANT_TO_STORE_YOUR_DB_FILES`
-   For example, on Windows use `dbpath=c:\mongodb\data` and on Linux `dbpath=/var/lib/mongodb/data`.
+Once you have `mongod` running locally, or a connection string to your Atlas MongoDB cluster, connect to it from your MongoDB Shell or Compass.
 
-5. Make sure the `dbpath` you specified exists.
+Try entering `db.version()` at the prompt to make sure everything's working as it should. Hopefully you'll see the server version number you connected to.
 
-6. Launch mongod with the `--config /path/to/your/mongodb.config` parameter.
 
-As an example for Windows users, if you extracted the downloaded file to `c:\mongodb\` and you created `c:\mongodb\data\` then within `c:\mongodb\bin\mongodb.config` you would specify `dbpath=c:\mongodb\data\`. You could then launch `mongod` from a command prompt via `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
-
-Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths. AK-TODO (brew on Mac?)
-
-Hopefully you now have MongoDB up and running. If you get an error, read the output carefully - the server is quite good at explaining what's wrong.
-
-You can now launch `mongo` (without the *d*) which will connect a shell to your running server. Try entering `db.version()` to make sure everything's working as it should. Hopefully you'll see the version number you installed.
-
-If you can't, or don't want to install `mongod` locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
-
-If you prefer GUI to command line shell, you can use [MongoDB Compass](URL AK-TODO), an open source GUI for MongoDB.
 
 # Chapter 1 - The Basics #
 We begin our journey by getting to know the basic mechanics of working with MongoDB. Obviously this is core to understanding MongoDB, but it should also help us answer higher-level questions about where MongoDB fits.
