@@ -19,10 +19,15 @@ His blog can be found at <http://openmymind.net>, and he tweets via [@karlseguin
 ## With Thanks To ##
 A special thanks to [Perry Neal](http://twitter.com/perryneal) for lending me his eyes, mind and passion. You provided me with invaluable help. Thank you.
 
+## About MongoDB Inc ##
+MongoDB Inc is the company behind MongoDB database platform. AK-TODO: consider few sentences about maintaining MongoDB server, hosting Atlas DaaS, and other products with link to more info
+
 ## Latest Version ##
-This version was updated for MongoDB 4.4 by Asya Kamsky.  The latest source of this book is available at:
+This version was updated for MongoDB 6.0 by Asya Kamsky.  The latest source of this book is available at:
 
 <http://github.com/karlseguin/the-little-mongodb-book>.
+
+// AK-TODO: consider re-homing at `mongodb-developer` repo 
 
 # Introduction #
  > It's not my fault the chapters are short, MongoDB is just easy to learn.
@@ -60,7 +65,7 @@ As you read through this, I encourage you to play with MongoDB to replicate what
 
 As an example for Windows users, if you extracted the downloaded file to `c:\mongodb\` and you created `c:\mongodb\data\` then within `c:\mongodb\bin\mongodb.config` you would specify `dbpath=c:\mongodb\data\`. You could then launch `mongod` from a command prompt via `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
 
-Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths. TODO (brew on Mac?)
+Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths. AK-TODO (brew on Mac?)
 
 Hopefully you now have MongoDB up and running. If you get an error, read the output carefully - the server is quite good at explaining what's wrong.
 
@@ -68,7 +73,7 @@ You can now launch `mongo` (without the *d*) which will connect a shell to your 
 
 If you can't, or don't want to install `mongod` locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
 
-If you prefer GUI to command line shell, you can use [MongoDB Compass](URL TODO), an open source GUI for MongoDB.
+If you prefer GUI to command line shell, you can use [MongoDB Compass](URL AK-TODO), an open source GUI for MongoDB.
 
 # Chapter 1 - The Basics #
 We begin our journey by getting to know the basic mechanics of working with MongoDB. Obviously this is core to understanding MongoDB, but it should also help us answer higher-level questions about where MongoDB fits.
@@ -509,12 +514,12 @@ For me, the real benefit of dynamic schema is the lack of setup and the reduced 
 
 Think about it from the perspective of a driver developer. You want to save an object? Serialize it to JSON (technically BSON, but close enough) and send it to MongoDB. There is no property mapping or type mapping. This straightforwardness definitely flows to you, the end developer.
 
-TODO should there be a section on schema/document validation?  If so where?
+AK-TODO should there be a section on schema/document validation?  If so where?
 
 ## Writes ##
-TODO check if true, reframe One area where MongoDB can fit a specialized role is in logging. There are two aspects of MongoDB which make writes quite fast. First, you have an option to send a write command and have it return immediately without waiting for the write to be acknowledged. Secondly, you can control the write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-write, giving you a great level of control over write performance and data durability.
+AK-TODO check if true, reframe One area where MongoDB can fit a specialized role is in logging. There are two aspects of MongoDB which make writes quite fast. First, you have an option to send a write command and have it return immediately without waiting for the write to be acknowledged. Secondly, you can control the write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-write, giving you a great level of control over write performance and data durability.
 
-TODO do we want to promote capped collections? In addition to these performance factors, log data is one of those data sets which can often take advantage of schema-less collections. Finally, MongoDB has something called a [capped collection](http://docs.mongodb.org/manual/core/capped-collections/). So far, all of the implicitly created collections we've created are just normal collections. We can create a capped collection by using the `db.createCollection` command and flagging it as capped:
+AK-TODO do we want to promote capped collections? In addition to these performance factors, log data is one of those data sets which can often take advantage of schema-less collections. Finally, MongoDB has something called a [capped collection](http://docs.mongodb.org/manual/core/capped-collections/). So far, all of the implicitly created collections we've created are just normal collections. We can create a capped collection by using the `db.createCollection` command and flagging it as capped:
 
 	//limit our capped collection to 1 megabyte
 	db.createCollection('logs', {capped: true,
@@ -530,27 +535,27 @@ Prior to version 1.8, MongoDB did not have single-server durability. That is, a 
 Durability is only mentioned here because a lot has been made around MongoDB's past lack of single-server durability. This'll likely show up in Google searches for some time to come. Information you find about journaling being a missing feature is simply out of date.
 
 ## Full Text Search ##
-True full text search capability is a recent addition to MongoDB.  It supports fifteen languages with stemming and stop words. With MongoDB's support for arrays and full text search you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    TODO mention Atlas search with Lucene?
+True full text search capability is a recent addition to MongoDB.  It supports fifteen languages with stemming and stop words. With MongoDB's support for arrays and full text search you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    AK-TODO mention Atlas search with Lucene?
 
 ## Transactions ##
 MongoDB added full support for ACID transactions in 4.0 (extending it to sharded clusters in 4.2). Before that there were two alternatives, one which is great and still has its place, and the other that was cumbersome but flexible.
 
 The first is its many atomic update operations. These are great, so long as they actually address your problem. We already saw some of the simpler ones, like `$inc` and `$set`. There are also commands like `findAndModify` which can update or delete a document and return it atomically.  When atomicity can be ensured this way, it's preferable to using transactions for speed and overall scalability of the system.
 
-The second, when atomic operations aren't enough, was to fall back to a two-phase commit. A two-phase commit is to transactions what manual dereferencing is to joins. It's a storage-agnostic solution that you do in code. Two-phase commits are actually quite popular in the relational world as a way to implement transactions across multiple databases. TODO check TODO The MongoDB website [had an example](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) illustrating the most typical example (a transfer of funds). The general idea is that you store the state of the transaction within the actual document being updated atomically and go through the init-pending-commit/rollback steps manually.  This is the case where using MongoDB transactions is a great option as they significantly simplify the application code.
+The second, when atomic operations aren't enough, was to fall back to a two-phase commit. A two-phase commit is to transactions what manual dereferencing is to joins. It's a storage-agnostic solution that you do in code. Two-phase commits are actually quite popular in the relational world as a way to implement transactions across multiple databases. AK-TODO check AK-TODO The MongoDB website [had an example](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) illustrating the most typical example (a transfer of funds). The general idea is that you store the state of the transaction within the actual document being updated atomically and go through the init-pending-commit/rollback steps manually.  This is the case where using MongoDB native multi-document transactions is a great option as they significantly simplify the application code.
 
-TODO short paragraph on transactions?
+TODO short paragraph on transaction details?
 
 ## Data Processing ##
-Before version 2.2 MongoDB relied on MapReduce for most data processing jobs. As of 2.2 it has added a powerful feature called  [aggregation framework or pipeline](http://docs.mongodb.org/manual/core/aggregation-pipeline/), so you'll only need to use MapReduce in rare cases where you need complex functions for aggregations that are not yet supported in the pipeline. In the next chapter we'll look at Aggregation Pipeline in detail. For now you can think of it as feature-rich and different ways to `group by` (which is an understatement).  For parallel processing of very large data, you may need to rely on something else, such as Hadoop. Thankfully, since the two systems really do complement each other, there's a [MongoDB connector for Hadoop](http://docs.mongodb.org/ecosystem/tools/hadoop/).
+Before version 2.2 MongoDB relied on MapReduce for most data processing jobs. As of 2.2 it has added a powerful feature called  [aggregation framework or pipeline](http://docs.mongodb.org/manual/core/aggregation-pipeline/), AK-TODO (remove mapReduce references) so you'll only need to use MapReduce in rare cases where you need complex functions for aggregations that are not yet supported in the pipeline. In the next chapter we'll look at Aggregation Pipeline in detail. For now you can think of it as feature-rich and different ways to `group by` (which is an understatement).  For parallel processing of very large data, you may need to rely on something else, such as Hadoop. Thankfully, since the two systems really do complement each other, there's a [MongoDB connector for Hadoop](http://docs.mongodb.org/ecosystem/tools/hadoop/).
 
-Of course, parallelizing data processing isn't something relational databases excel at either. There are plans for future versions of MongoDB to be better at handling very large sets of data.
+Of course, parallelizing data processing isn't something relational databases excel at either. There are plans for future versions of MongoDB to be better at handling very large sets of data. AK-TODO Data Lake?
 
 ## Geospatial ##
 A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. This is a feature best explained via some visual aids, so I invite you to try the [5 minute geospatial interactive tutorial](http://mongly.openmymind.net/geo/index), if you want to learn more.  TODO is this still up?
 
 ## Tools and Maturity ##
-You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, the lack of support for (NEED NEW EXAMPLE) TODO base-10 floating point numbers will obviously be a concern (though not necessarily a show-stopper) for systems dealing with money. TODO
+You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, the lack of support for (NEED NEW EXAMPLE) AK-TODO base-10 floating point numbers will obviously be a concern (though not necessarily a show-stopper) for systems dealing with money. AK-TODO
 
 On the positive side, drivers exist for a great many languages, the protocol is modern and simple, and development is happening at blinding speeds. MongoDB is in production at enough companies that concerns about maturity, while valid, are quickly becoming a thing of the past.
 
@@ -588,11 +593,11 @@ MongoDB arrays are powerful and they don't stop us from being able to aggregate 
 
 Here we will find out which food item is loved by the most unicorns and we will also get the list of names of all the unicorns that love it.  `$sort` and `$limit` in combination allow you to get answers to "top N" types of questions.
 
-There are other powerful pipeline operator which allow you to transform values of fields as well as add (or remove) fields.  TODO how to list [`$project`](http://docs.mongodb.org/manual/reference/operator/aggregation/project/#pipe._S_project) (analogous to the projection we can specify to `find`) which allows you not just to include certain fields, but to create or calculate new fields based on values in existing fields.  For example, you can use math operators to add together values of several fields before finding out the average, or you can use string operators to create a new field that's a concatenation of some existing fields.
+There are other powerful pipeline operator which allow you to transform values of fields as well as add (or remove) fields.  AK-TODO how to list [`$project`](http://docs.mongodb.org/manual/reference/operator/aggregation/project/#pipe._S_project) (analogous to the projection we can specify to `find`) which allows you not just to include certain fields, but to create or calculate new fields based on values in existing fields.  For example, you can use math operators to add together values of several fields before finding out the average, or you can use string operators to create a new field that's a concatenation of some existing fields.
 
-This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` state, as well as transitive closure expressions via recursive lookup called `$graphLookup`. Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 1) or it can write your results into a new collection using the `$out` pipeline operator.  In 4.2 aggregation output options got more powerful with a new operator `$merge` which allows output to an existing collection with powerful controls that let you control exactly how the new output is merged with existing documents.  You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).
+This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`. Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 1) or it can write your results into a new collection using the `$out` pipeline operator.  In 4.2 aggregation output options got more powerful with a new stage `$merge` which allows output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents.  You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  AK-TODO include link to Paul Done's agg e-book?
 
-TODO sentence addressing why MapReduce is being phased out. and what UDF added to Agg is.
+AK-TODO sentence addressing why MapReduce is out. and what UDF added to Agg is.
 
 ## In This Chapter ##
 In this chapter we covered MongoDB's [aggregation capabilities](http://docs.mongodb.org/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group data. With addition to user defined functions in 4.4 while it is more complicated to understand, but its capabilities can be as boundless as any code you can write in JavaScript.
@@ -631,7 +636,7 @@ To see whether or not your queries are using an index, you can use the `explain`
 
 The output includes a friend telling us what "plan" the optimizer used, `COLLSCAN` means the query was not indexed, that 12 objects were scanned, how long it took, and if the plan was `IXSCAN` what index was used as well as a few other pieces of useful information.
 
-If we change our query to use an index, we'll see that a TODO change all this for new output `BtreeCursor` was used, as well as the index used to fulfill the request:
+If we change our query to use an index, we'll see that a AK-TODO change all this for new output `BtreeCursor` was used, as well as the index used to fulfill the request:
 
 	db.unicorns.find({name: 'Pilot'}).explain()
 
@@ -667,10 +672,10 @@ You disable the profiler by calling `setProfilingLevel` again but changing the p
 	//more than 1 second
 	db.setProfilingLevel(1, 1000);
 
-TODO mention sampling and that profiling isn't for production.  You can also specify a third parameter to indicate a sampling threshold - by default all queries over slow ms will be profiled, equ
+AK-TODO mention sampling and that profiling isn't usually for production.  You can also specify a third parameter to indicate a sampling threshold - by default all queries over slow ms will be profiled, also AK-TODO mention profile `filter`
 
 ## Backups and Restore ##
-Within the MongoDB `bin` folder is a `mongodump` executable. Simply executing `mongodump` will connect to localhost and backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are `--db DBNAME` to back up a specific database and `--collection COLLECTIONNAME` to back up a specific collection. You can then use the `mongorestore` executable, located in the same `bin` folder, to restore a previously made backup. Again, the `--db` and `--collection` can be specified to restore a specific database and/or collection.  `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
+AK-TODO TOOLS ARE NOT SEPARATE PACKAGING Within the MongoDB `bin` folder is a `mongodump` executable. Simply executing `mongodump` will connect to localhost and backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are `--db DBNAME` to back up a specific database and `--collection COLLECTIONNAME` to back up a specific collection. You can then use the `mongorestore` executable, located in the same `bin` folder, to restore a previously made backup. Again, the `--db` and `--collection` can be specified to restore a specific database and/or collection.  `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
 
 For example, to back up our `learn` database to a `backup` folder, we'd execute (this is its own executable which you run in a command/terminal window, not within the mongo shell itself):
 
@@ -681,7 +686,7 @@ To restore only the `unicorns` collection, we could then do:
 	mongorestore --db learn --collection unicorns \
 		backup/learn/unicorns.bson
 
-It's worth pointing out that `mongoexport` and `mongoimport` are two other executables which can be used to export and import data from JSON or CSV. For example, we can get a JSON output by doing:
+It's worth pointing out that `mongoexport` and `mongoimport` are two other executables which can be used to export and import data to/from JSON or CSV. For example, we can get a JSON output by doing:
 
 	mongoexport --db learn --collection unicorns
 
@@ -691,12 +696,12 @@ And a CSV output by doing:
 		--collection unicorns \
 		--csv --fields name,weight,vampires
 
-Note that `mongoexport` and `mongoimport` cannot always represent your data. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](http://docs.mongodb.org/manual/core/backups/) in the MongoDB Manual.
+Note that `mongoexport` and `mongoimport` cannot always represent your data fully. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](http://docs.mongodb.org/manual/core/backups/) in the MongoDB Manual.
 
 ## In This Chapter ##
 In this chapter we looked at various commands, tools and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simple to use.
 
 # Conclusion #
-You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.org/) has a lot of useful information. The official [MongoDB user group](http://groups.google.com/group/mongodb-user) is a great place to ask questions.
+You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.org/) has a lot of useful information. The official AK-TODO replace with reference to community site [MongoDB user group](http://groups.google.com/group/mongodb-user) is a great place to ask questions.
 
 NoSQL was born not only out of necessity, but also out of an interest in trying new approaches. It is an acknowledgment that our field is ever-advancing and that if we don't try, and sometimes fail, we can never succeed. This, I think, is a good way to lead our professional lives.
