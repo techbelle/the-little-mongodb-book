@@ -6,7 +6,7 @@ PDF_BUILDER_FLAGS = \
 	--pdf-engine xelatex \
 	--template ../common/pdf-template.tex \
         --top-level-division=section \
-	--listings
+	--listings -V links-as-notes=true
 
 EPUB_BUILDER = pandoc
 EPUB_BUILDER_FLAGS = \
