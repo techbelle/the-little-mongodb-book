@@ -183,11 +183,10 @@ We haven't looked at the `update` command yet, or some of the fancier things we 
 # Chapter 2 - Updating #
 In chapter 1 we introduced three of the four CRUD (create, read, update and delete) operations. This chapter is dedicated to the one we skipped over: `update`. `Update` has a few surprising behaviors, which is why we dedicate a chapter to it.
 
-## Update: Replace Versus $set ##
+## Update: Replace Versus `$set` ##
 In its simplest form, `update` takes two parameters: the selector (where) to use and what updates to apply to fields. If Roooooodles had gained a bit of weight, you might expect that we should execute:
 
-	db.unicorns.update({name: 'Roooooodles'},
-		{weight: 590})
+	db.unicorns.updateOne({name: 'Roooooodles'}, {weight: 590})
 
 (If you've played with your `unicorns` collection and it doesn't have the original data anymore, go ahead and `remove` all documents and re-insert from the code in chapter 1.)
 
@@ -197,9 +196,9 @@ Now, if we look at the updated record:
 
 You should discover the first surprise of `update`. No document is found because the second parameter we supplied didn't have any update operators, and therefore it was used to **replace** the original document. In other words, the `update` found a document by `name` and replaced the entire document with the new document (the second parameter). There is no equivalent functionality to this in SQL's `update` command. In some situations, this is ideal and can be leveraged for some truly dynamic updates. However, when you want to change the value of one, or a few fields, you must use MongoDB's `$set` operator. Go ahead and run this update to reset the lost fields:
 
-	db.unicorns.update({weight: 590}, {$set: {
+	db.unicorns.updateOne({weight: 590}, {$set: {
 		name: 'Roooooodles',
-		dob: new Date(1979, 7, 18, 18, 44),
+		dob: ISODate("1979-08-18T18:44"),
 		loves: ['apple'],
 		gender: 'm',
 		vampires: 99}})
@@ -210,19 +209,16 @@ This won't overwrite the new `weight` since we didn't specify it. Now if we exec
 
 We get the expected result. Therefore, the correct way to have updated the weight in the first place is:
 
-	db.unicorns.update({name: 'Roooooodles'},
-		{$set: {weight: 590}})
+	db.unicorns.updateOne({name: 'Roooooodles'}, {$set: {weight: 590}})
 
 ## Update Operators ##
 In addition to `$set`, we can leverage other operators to do some nifty things. All update operators work on fields - so your entire document won't be wiped out. For example, the `$inc` operator is used to increment a field by a certain positive or negative amount. If Pilot was incorrectly awarded a couple vampire kills, we could correct the mistake by executing:
 
-	db.unicorns.update({name: 'Pilot'},
-		{$inc: {vampires: -2}})
+	db.unicorns.updateOne({name: 'Pilot'}, {$inc: {vampires: -2}})
 
 If Aurora suddenly developed a sweet tooth, we could add a value to her `loves` field via the `$push` operator:
 
-	db.unicorns.update({name: 'Aurora'},
-		{$push: {loves: 'sugar'}})
+	db.unicorns.updateOne({name: 'Aurora'}, {$push: {loves: 'sugar'}})
 
 The [Update Operators](http://docs.mongodb.org/manual/reference/operator/update/#update-operators) section of the MongoDB manual has more information on the other available update operators.
 
@@ -231,38 +227,32 @@ One of the more pleasant surprises of using `update` is that it fully supports `
 
 A mundane example is a hit counter for a website. If we wanted to keep an aggregate count in real time, we'd have to see if the record already existed for the page, and based on that decide to run an update or insert. With the upsert option omitted (or set to false), executing the following won't do anything:
 
-	db.hits.update({page: 'unicorns'},
-		{$inc: {hits: 1}});
+	db.hits.updateOne({page: 'unicorns'}, {$inc: {hits: 1}});
 	db.hits.find();
 
 However, if we add the upsert option, the results are quite different:
 
-	db.hits.update({page: 'unicorns'},
-		{$inc: {hits: 1}}, {upsert:true});
+	db.hits.updateOne({page: 'unicorns'}, {$inc: {hits: 1}}, {upsert:true});
 	db.hits.find();
 
 Since no documents exist with a field `page` equal to `unicorns`, a new document is inserted. If we execute it a second time, the existing document is updated and `hits` is incremented to 2.
 
-	db.hits.update({page: 'unicorns'},
-		{$inc: {hits: 1}}, {upsert:true});
+	db.hits.updateOne({page: 'unicorns'}, {$inc: {hits: 1}}, {upsert:true});
 	db.hits.find();
 
 ## Multiple Updates ##
-The final surprise `update` has to offer is that, by default, it'll update a single document. So far, for the examples we've looked at, this might seem logical. However, if you executed something like:
+The final surprise `update` has to offer is that, by default, it'll update a single document, which is why the shell helper is called `updateOne`. So far, for the examples we've looked at, this might seem logical. However, if you executed something like:
 
-	db.unicorns.update({},
-		{$set: {vaccinated: true }});
+	db.unicorns.updateOne({}, {$set: {vaccinated: true }});
 	db.unicorns.find({vaccinated: true});
 
-You might expect to find all of your precious unicorns to be vaccinated. To get the behavior you desire, the `multi` option must be set to true:
+You might want to find all of your precious unicorns to be vaccinated. To get the behavior you desire, use `updateMany` helper which executes the `update` command with the `multi` option set to true:
 
-	db.unicorns.update({},
-		{$set: {vaccinated: true }},
-		{multi:true});
+	db.unicorns.updateMany({}, {$set: {vaccinated: true }});
 	db.unicorns.find({vaccinated: true});
 
 ## In This Chapter ##
-This chapter concluded our introduction to the basic CRUD operations available against a collection. We looked at `update` in detail and observed three interesting behaviors. First, if you pass it a document without update operators, MongoDB's `update` will replace the existing document. Because of this, normally you will use the `$set` operator (or one of the many other available operators that modify the document). Secondly, `update` supports an intuitive `upsert` option which is particularly useful when you don't know if the document already exists. Finally, by default, `update` updates only the first matching document, so use the `multi` option when you want to update all matching documents.
+This chapter concluded our introduction to the basic CRUD operations available against a collection. We looked at `update` in detail and observed three interesting behaviors. First, if you pass it a document without update operators, MongoDB's `update` will replace the existing document. Because of this, normally you will use the `$set` operator (or one of the many other available operators that modify the document). Secondly, `update` supports an intuitive `upsert` option which is particularly useful when you don't know if the document already exists. Finally, by default, `update` updates only the first matching document, so use `updateOne` helper if you want to update one document, and use `updateMany` when you want to update all matching documents.
 
 # Chapter 3 - Mastering Find #
 Chapter 1 provided a superficial look at the `find` command. There's more to `find` than understanding `selectors` though. We already mentioned that the result from `find` is a `cursor`. We'll now look at exactly what this means in more detail.
@@ -282,31 +272,26 @@ A few times now I've mentioned that `find` returns a cursor whose execution is d
 	//heaviest unicorns first
 	db.unicorns.find().sort({weight: -1})
 
-	//by unicorn name then vampire kills:
-	db.unicorns.find().sort({name: 1,
-		vampires: -1})
+	//by gender and then vampire kills:
+	db.unicorns.find().sort({gender: 1, vampires: -1})
 
 As with a relational database, MongoDB can use an index for sorting. We'll look at indexes in more detail later on. However, you should know that MongoDB limits the size of your sort without an index. That is, if you try to sort a very large result set which can't use an index, you'll get an error. Some people see this as a limitation. In truth, I wish more databases had the capability to refuse to run unoptimized queries. (I won't turn every MongoDB drawback into a positive, but I've seen enough poorly optimized databases that I sincerely wish they had a strict-mode.)
 
 ## Paging ##
 Paging results can be accomplished via the `limit` and `skip` cursor methods. To get the second and third heaviest unicorn, we could do:
 
-	db.unicorns.find()
-		.sort({weight: -1})
-		.limit(2)
-		.skip(1)
+	db.unicorns.find().sort({weight: -1}).skip(1).limit(2)
 
-Using `limit` in conjunction with `sort`, can be a way to avoid running into problems when sorting on non-indexed fields.
+Using `limit` in conjunction with `sort`, can be a way to avoid running into problems when sorting on non-indexed fields. # AK-TODO remove pagination reference?
 
 ## Count ##
-The shell makes it possible to execute a `count` directly on a collection, such as:
+The shell makes it possible to execute a `count` directly on a collection, such as: AK-TODO replace with countDocuments and estimatedCount maybe?
 
 	db.unicorns.count({vampires: {$gt: 50}})
 
 In reality, `count` is actually a `cursor` method, the shell simply provides a shortcut. Drivers which don't provide such a shortcut need to be executed like this (which will also work in the shell):
 
-	db.unicorns.find({vampires: {$gt: 50}})
-		.count()
+	db.unicorns.find({vampires: {$gt: 50}}).count()
 
 ## In This Chapter ##
 Using `find` and `cursors` is a straightforward proposition. There are a few additional commands that we'll either cover in later chapters or which only serve edge cases, but, by now, you should be getting pretty comfortable working in the mongo shell and understanding the fundamentals of MongoDB.
@@ -321,48 +306,31 @@ The first and most fundamental difference that you'll need to get comfortable wi
 
 Without knowing anything else, to live in a join-less world, we have to do joins ourselves within our application's code. Essentially we need to issue a second query to `find` the relevant data in a second collection. Setting our data up isn't any different than declaring a foreign key in a relational database. Let's give a little less focus to our beautiful `unicorns` and a bit more time to our `employees`. The first thing we'll do is create an employee (I'm providing an explicit `_id` so that we can build coherent examples)
 
-	db.employees.insert({_id: ObjectId(
-		"4d85c7039ab0fd70a117d730"),
-		name: 'Leto'})
+	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d730"), name: 'Leto'})
 
 Now let's add a couple employees and set their manager as `Leto`:
 
-	db.employees.insert({_id: ObjectId(
-		"4d85c7039ab0fd70a117d731"),
-		name: 'Duncan',
-		manager: ObjectId(
-		"4d85c7039ab0fd70a117d730")});
-	db.employees.insert({_id: ObjectId(
-		"4d85c7039ab0fd70a117d732"),
-		name: 'Moneo',
-		manager: ObjectId(
-		"4d85c7039ab0fd70a117d730")});
+	db.employees.insertMany([
+	  {_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', manager: ObjectId("4d85c7039ab0fd70a117d730")},
+     {_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', manager: ObjectId("4d85c7039ab0fd70a117d730")} ]);
 
 
 (It's worth repeating that the `_id` can be any unique value. Since you'd likely use an `ObjectId` in real life, we'll use them here as well.)
 
 Of course, to find all of Leto's employees, one simply executes:
 
-	db.employees.find({manager: ObjectId(
-		"4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
 
 There's nothing magical here. In the worst cases, most of the time, the lack of join will merely require an extra query (likely indexed).
 
 ## Arrays and Embedded Documents ##
 Just because MongoDB doesn't have full support for joins doesn't mean it doesn't have a few tricks up its sleeve. Remember when we saw that MongoDB supports arrays as first class objects of a document? It turns out that this is incredibly handy when dealing with many-to-one or many-to-many relationships. As a simple example, if an employee could have two managers, we could simply store these in an array:
 
-	db.employees.insert({_id: ObjectId(
-		"4d85c7039ab0fd70a117d733"),
-		name: 'Siona',
-		manager: [ObjectId(
-		"4d85c7039ab0fd70a117d730"),
-		ObjectId(
-		"4d85c7039ab0fd70a117d732")] })
+	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', manager: [ObjectId("4d85c7039ab0fd70a117d730"), ObjectId("4d85c7039ab0fd70a117d732")] })
 
 Of particular interest is that, for some documents, `manager` can be a scalar value, while for others it can be an array. Our original `find` query will work for both:
 
-	db.employees.find({manager: ObjectId(
-		"4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
 
 You'll quickly find that arrays of values are much more convenient to deal with than many-to-many join-tables.
 
@@ -378,8 +346,7 @@ Besides arrays, MongoDB also supports embedded documents. Go ahead and try inser
 
 In case you are wondering, embedded documents can be queried using a dot-notation:
 
-	db.employees.find({
-		'family.mother': 'Chani'})
+	db.employees.find({'family.mother': 'Chani'})
 
 We'll briefly talk about where embedded documents fit and how you should use them.
 
