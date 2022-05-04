@@ -47,15 +47,15 @@ Most of this book will focus on core MongoDB functionality. We'll therefore rely
 
 This does bring up the first thing you should know about MongoDB: its drivers. MongoDB has a [number of official drivers](http://docs.mongodb.org/ecosystem/drivers/) for various languages. These drivers can be thought of as the various database drivers you are probably already familiar with. On top of these drivers, the development community has built more language/framework-specific libraries. For example, [MongoMapper](https://github.com/jnunemaker/mongomapper) is a Ruby library which is ActiveRecord-friendly and [Motor](https://motor.readthedocs.io/en/stable/index.html) is an asynchronous Python driver which works with Tornado or asyncio. Whether you choose to program directly against the core MongoDB drivers or some higher-level library is up to you. I point this out only because many people new to MongoDB are confused as to why there are both official drivers and community libraries - the former generally focuses on core communication/connectivity with MongoDB and the latter with more language and framework-specific implementations.
 
-As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that you might come up with on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up.  You'll need to have a MongoDB server running somewhere, as well as a MongoDB client (shell or GUI) running locally.
+As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that you might come up with on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up.  You'll need to have a MongoDB server running somewhere, as well as a MongoDB client (CLI or GUI) running locally.
 
-First, install either MongoDB Shell from [the official page](https://www.mongodb.com/docs/mongodb-shell/) or if you prefer GUI to command line shell, you can use [MongoDB Compass](https://www.mongodb.com/try/download/compass), an open source GUI for MongoDB.  MongoDB Compass has the shell built-in so you can switch between using GUI and command line as you wish.
+For the client part, install either MongoDB Shell from [the official page](https://www.mongodb.com/docs/mongodb-shell/) or if you prefer GUI to command line shell, you can use [MongoDB Compass](https://www.mongodb.com/try/download/compass), an open source GUI for MongoDB. MongoDB Compass has the shell built-in so you can switch between using GUI and command line as you wish.
 
-If you don't want to (or can't) install MongoDB server locally, you can sign up for a free MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
+To run the server, if you don't want to (or can't) install MongoDB server locally, you can sign up for a free hosted MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
 
 If you can run MongoDB locally and prefer to do that, follow instructions for your operating system on the [official installation manual page](https://www.mongodb.com/docs/manual/administration/install-community/).
 
-Once you have `mongod` running locally, or a connection string to your Atlas MongoDB cluster, connect to it from your MongoDB Shell or Compass.
+Once you have `mongod` running locally or a connection string to your Atlas MongoDB cluster, connect to it from your MongoDB Shell or Compass.
 
 Try entering `db.version()` at the prompt to make sure everything's working as it should. Hopefully you'll see the server version number you connected to.
 
@@ -70,32 +70,31 @@ To get started, there are six simple concepts we need to understand.
 
 2. A database can have zero or more `collections`. A collection shares enough in common with a traditional `table` that you can safely think of the two as the same thing.
 
-3. Collections are made up of zero or more `documents`. Again, a document can safely be thought of as a `row`.
+3. Collections are made up of zero or more `documents`. Again, a document can safely be thought of as analogous to a `row`.
 
-4. A document is made up of one or more `fields`, which you can probably guess are a lot like `columns`.
+4. A document is made up of one or more `fields`, which you can probably guess are somewhat like `columns`.
 
 5. `Indexes` in MongoDB function mostly like their RDBMS counterparts.
 
 6. `Cursors` are like relational database cursors, but they are important enough, and often overlooked, that I think they are worthy of their own discussion.  The important thing to understand about cursors is that when you ask MongoDB for data, it returns a pointer to the result set called a cursor, which we can do things to, such as counting or skipping ahead, before actually pulling down data.
 
-To recap, MongoDB is made up of `databases` which contain `collections`. A `collection` is made up of `documents`. Each `document` is made up of `fields`. `Collections` can be `indexed`, which improves lookup and sorting performance. Finally, when we get data from MongoDB we usually do so through a `cursor` whose actual execution is delayed until necessary.
+To recap, MongoDB is made up of `databases` which contain `collections`. A `collection` is made up of `documents`. Each `document` is made up of `fields`. `Collections` can be `indexed`, which improves query and sorting performance. Finally, when we get data from MongoDB we usually do so through a `cursor` whose actual execution is delayed until necessary.
 
 Why use new terminology (collection vs. table, document vs. row and field vs. column)? Is it just to make things more complicated? The truth is that while these concepts are similar to their relational database counterparts, they are not identical. The core difference comes from the fact that relational databases define `columns` at the `table` level whereas a document-oriented database defines its `fields` at the `document` level. That is to say that each `document` within a `collection` can have its own unique set of `fields`.  As such, a `collection` is a dumbed down container in comparison to a `table`, while a `document` has a lot more information than a `row`.
 
-Although this is important to understand, don't worry if things aren't yet clear. It won't take more than a couple of inserts to see what this truly means. Ultimately, the point is that a collection isn't strict about what goes in it (it's schema-less). Fields are tracked with each individual document. The benefits and drawbacks of this will be explored in a future chapter.
+Although this is important to understand, don't worry if things aren't yet clear. It won't take more than a couple of inserts to see what this truly means. Ultimately, the point is that a collection isn't strict about what goes in it (its schema is flexible/dynamic). Fields are tracked with each individual document. The benefits and drawbacks of this will be explored in a future chapter.
 
-Let's get hands-on. If you don't have it running already, go ahead and start the `mongod` server as well as a mongo shell. The shell runs JavaScript. There are some global commands you can execute, like `help` or `exit`. Commands that you execute against the current database are executed against the `db` object, such as `db.help()` or `db.stats()`. Commands that you execute against a specific collection, which is what we'll be doing a lot of, are executed against the `db.COLLECTION_NAME` object, such as `db.unicorns.help()` or `db.unicorns.count()`.
+Let's get hands-on. If you don't have it running already, go ahead and start the `mongod` server as well as a mongo shell or Compass. The shell runs JavaScript. There are some global commands you can execute, like `help` or `exit`. Commands that you execute against the current database are executed against the `db` object, such as `db.help()` or `db.stats()`. Commands that you execute against a specific collection, which is what we'll be doing a lot of, are executed against the `db.COLLECTION_NAME` object, such as `db.unicorns.help()` or `db.unicorns.count()`.
 
 Go ahead and enter `db.help()`, you'll get a list of commands that you can execute against the `db` object.
 
-A small side note: Because this is a JavaScript shell, if you execute a method and omit the parentheses `()`, you'll see the method body rather than executing the method. I only mention it so that the first time you do it and get a response that starts with `function (...){` you won't be surprised. For example, if you enter `db.help` (without the parentheses), you'll see the internal implementation of the `help` method.
+A small side note: Because this is a JavaScript shell, if you execute a method and omit the parentheses `()`, you'll see the method body rather than executing the method. I only mention it so that the first time you do it and get a response that starts with `[Function: ...` you won't be surprised. For example, if you enter `db.stats` (without the parentheses), you'll see the details of  implementation of the `stats` method.
 
-First we'll use the global `use` helper to switch databases, so go ahead and enter `use learn`. It doesn't matter that the database doesn't really exist yet. The first collection that we create will also create the actual `learn` database. Now that you are inside a database, you can start issuing database commands, like `db.getCollectionNames()`. If you do so, you should get an empty array (`[ ]`). Since collections are schema-less, we don't explicitly need to create them. We can simply insert a document into a new collection. To do so, use the `insert` command, supplying it with the document to insert:
+First we'll use the global `use` helper to switch databases, so go ahead and enter `use learn`. It doesn't matter that the database doesn't exist yet. The first collection that we create will also create the actual `learn` database. Now that you are inside a database, you can start issuing database commands, like `db.getCollectionNames()`. If you do so, you should get an empty array (`[ ]`). Since collections don't have schema, we don't usually need to explicitly create them. We can simply insert a document into a new collection. To do so, use the `insert` command, supplying it with the document to insert:
 
-	db.unicorns.insert({name: 'Aurora',
-		gender: 'f', weight: 450})
+	db.unicorns.insertOne({name: 'Aurora', gender: 'f', weight: 450})
 
-The above line is executing `insert` against the `unicorns` collection, passing it a single parameter. Internally MongoDB uses a binary serialized JSON format called BSON. Externally, this means that we use JSON a lot, as is the case with our parameters. If we execute `db.getCollectionNames()` now, we'll see a `unicorns` collection.
+The above line is executing `insert` against the `unicorns` collection, passing it a single document. Internally MongoDB uses a binary serialized JSON format called BSON. Externally, this means that we use JSON a lot, as is the case with our parameters. If we execute `db.getCollectionNames()` now, we'll see a `unicorns` collection.
 
 You can now use the `find` command against `unicorns` to return a list of documents:
 
@@ -105,122 +104,66 @@ Notice that, in addition to the data you specified, there's an `_id` field. Ever
 
 	db.unicorns.getIndexes()
 
-What you're seeing is the name of the index, the database and collection it was created against and the fields included in the index.
+What you're seeing is the name of the index and the fields included in the index.
 
-Now, back to our discussion about schema-less collections. Insert a totally different document into `unicorns`, such as:
+Now, back to our discussion about "schemaless" collections. Insert a totally different document into `unicorns`, such as:
 
-	db.unicorns.insert({name: 'Leto',
-		gender: 'm',
-		home: 'Arrakeen',
-		worm: false})
+	db.unicorns.insertOne({name: 'Leto', gender: 'm', home: 'Arrakeen', worm: false})
 
 And, again use `find` to list the documents. Once we know a bit more, we'll discuss this interesting behavior of MongoDB, but hopefully you are starting to understand why the more traditional terminology wasn't a good fit.
 
 ## Mastering Selectors ##
-In addition to the six concepts we've explored, there's one practical aspect of MongoDB you need to have a good grasp of before moving to more advanced topics: query selectors. A MongoDB query selector is like the `where` clause of an SQL statement. As such, you use it when finding, counting, updating and removing documents from collections. A selector is a JSON object, the simplest of which is `{}` which matches all documents. If we wanted to find all female unicorns, we could use `{gender:'f'}`.
+In addition to the six concepts we've explored, there's one practical aspect of MongoDB you need to have a good grasp of before moving to more advanced topics: query selectors or predicates. A MongoDB query predicate is like the `WHERE` clause of an SQL statement. As such, you use it when finding, counting, updating and removing documents from collections. A selector is a JSON object, the simplest of which is `{}` which matches all documents. If we wanted to find all female unicorns, we could use `{gender:'f'}`.
 
 Before delving too deeply into selectors, let's set up some data to play with. First, remove what we've put so far in the `unicorns` collection via: `db.unicorns.remove({})`. Now, issue the following inserts to get some data we can play with (I suggest you copy and paste this):
 
-	db.unicorns.insert({name: 'Horny',
-		dob: new Date(1992,2,13,7,47),
-		loves: ['carrot','papaya'],
-		weight: 600,
-		gender: 'm',
-		vampires: 63});
-	db.unicorns.insert({name: 'Aurora',
-		dob: new Date(1991, 0, 24, 13, 0),
-		loves: ['carrot', 'grape'],
-		weight: 450,
-		gender: 'f',
-		vampires: 43});
-	db.unicorns.insert({name: 'Unicrom',
-		dob: new Date(1973, 1, 9, 22, 10),
-		loves: ['energon', 'redbull'],
-		weight: 984,
-		gender: 'm',
-		vampires: 182});
-	db.unicorns.insert({name: 'Roooooodles',
-		dob: new Date(1979, 7, 18, 18, 44),
-		loves: ['apple'],
-		weight: 575,
-		gender: 'm',
-		vampires: 99});
-	db.unicorns.insert({name: 'Solnara',
-		dob: new Date(1985, 6, 4, 2, 1),
-		loves:['apple', 'carrot',
-			'chocolate'],
-		weight:550,
-		gender:'f',
-		vampires:80});
-	db.unicorns.insert({name:'Ayna',
-		dob: new Date(1998, 2, 7, 8, 30),
-		loves: ['strawberry', 'lemon'],
-		weight: 733,
-		gender: 'f',
-		vampires: 40});
-	db.unicorns.insert({name:'Kenny',
-		dob: new Date(1997, 6, 1, 10, 42),
-		loves: ['grape', 'lemon'],
-		weight: 690,
-		gender: 'm',
-		vampires: 39});
-	db.unicorns.insert({name: 'Raleigh',
-		dob: new Date(2005, 4, 3, 0, 57),
-		loves: ['apple', 'sugar'],
-		weight: 421,
-		gender: 'm',
-		vampires: 2});
-	db.unicorns.insert({name: 'Leia',
-		dob: new Date(2001, 9, 8, 14, 53),
-		loves: ['apple', 'watermelon'],
-		weight: 601,
-		gender: 'f',
-		vampires: 33});
-	db.unicorns.insert({name: 'Pilot',
-		dob: new Date(1997, 2, 1, 5, 3),
-		loves: ['apple', 'watermelon'],
-		weight: 650,
-		gender: 'm',
-		vampires: 54});
-	db.unicorns.insert({name: 'Nimue',
-		dob: new Date(1999, 11, 20, 16, 15),
-		loves: ['grape', 'carrot'],
-		weight: 540,
-		gender: 'f'});
-	db.unicorns.insert({name: 'Dunx',
-		dob: new Date(1976, 6, 18, 18, 18),
-		loves: ['grape', 'watermelon'],
-		weight: 704,
-		gender: 'm',
-		vampires: 165});
+	db.unicorns.insertMany([
+      {name: 'Horny', dob: ISODate("1992-03-13T07:47"), 
+          loves: ['carrot','papaya'], weight: 600, gender: 'm', vampires: 63}, 
+      {name: 'Aurora', dob: ISODate("1991-01-24T13:00"), 
+          loves: ['carrot', 'grape'], weight: 450, gender: 'f', vampires: 43},
+      {name: 'Unicrom', dob: ISODate("1973-02-09T22:10"), 
+          loves: ['energon', 'redbull'], weight: 984, gender: 'm', vampires: 182},
+      {name: 'Roooooodles', dob: ISODate("1979-08-18T18:44"), 
+          loves: ['apple'], weight: 575, gender: 'm', vampires: 99},
+      {name: 'Solnara', dob: ISODate("1985-07-04T02:01"), 
+          loves:['apple', 'carrot', 'chocolate'], weight:550, gender:'f', vampires:80},
+      {name:'Ayna', dob: ISODate("1998-03-07T08:30"), 
+          loves: ['strawberry', 'lemon'], weight: 733, gender: 'f', vampires: 40},
+      {name:'Kenny', dob: ISODate("1997-07-01T10:42"), 
+          loves: ['grape', 'lemon'], weight: 690, gender: 'm', vampires: 39},
+      {name: 'Raleigh', dob: ISODate("2005-05-03T00:57"), 
+          loves: ['apple', 'sugar'], weight: 421, gender: 'm', vampires: 2},
+      {name: 'Leia', dob: ISODate("2001-10-08T14:53"), 
+          loves: ['apple', 'watermelon'], weight: 601, gender: 'f', vampires: 33},
+      {name: 'Pilot', dob: ISODate("1997-03-01T05:03"), 
+          loves: ['apple', 'watermelon'], weight: 650, gender: 'm', vampires: 54},
+      {name: 'Nimue', dob: ISODate("1999-12-20T00:16:15"), 
+          loves: ['grape', 'carrot'], weight: 540, gender: 'f'},
+      {name: 'Dunx', dob: ISODate("1976-07-18T18:18"), 
+          loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165}
+    ]);
 
 Now that we have data, we can master selectors. `{field: value}` is used to find any documents where `field` is equal to `value`. `{field1: value1, field2: value2}` is how we do an `and` statement. The special `$lt`, `$lte`, `$gt`, `$gte` and `$ne` are used for less than, less than or equal, greater than, greater than or equal and not equal operations. For example, to get all male unicorns that weigh more than 700 pounds, we could do:
 
-	db.unicorns.find({gender: 'm',
-		weight: {$gt: 700}})
-	//or (not quite the same thing, but for
-	//demonstration purposes)
-	db.unicorns.find({gender: {$ne: 'f'},
-		weight: {$gte: 701}})
+	db.unicorns.find({gender: 'm', weight: {$gt: 700}})
+	// or similar but not quite the same:
+	db.unicorns.find({gender: {$ne: 'f'}, weight: {$gte: 701}})
 
 
 The `$exists` operator is used for matching the presence or absence of a field, for example:
 
-	db.unicorns.find({
-		vampires: {$exists: false}})
+	db.unicorns.find({vampires: {$exists: false}})
 
-should return a single document. The '$in' operator is used for matching one of several values that we pass as an array, for example:
+should return a single document. The `$in` operator is used for matching one of several values that we pass as an array, for example:
 
-    db.unicorns.find({
-    	loves: {$in:['apple','orange']}})
+    db.unicorns.find({loves: {$in:['apple','orange']}})
 
 This returns any unicorn who loves 'apple' or 'orange'.
 
-If we want to OR rather than AND several conditions on different fields, we use the `$or` operator and assign to it an array of selectors we want or'd:
+Multiple conditions separated by `,` are implicitly connected by `AND`. If we want to `OR` rather than `AND` several conditions on different fields, we use the `$or` operator and assign to it an array of selectors we want to `OR`:
 
-	db.unicorns.find({gender: 'f',
-		$or: [{loves: 'apple'},
-		      {weight: {$lt: 500}}]})
+	db.unicorns.find({gender: 'f', $or: [{loves: 'apple'}, {weight: {$lt: 500}}]})
 
 The above will return all female unicorns which either love apples or weigh less than 500 pounds.
 
@@ -232,8 +175,7 @@ We've seen how these selectors can be used with the `find` command. They can als
 
 The `ObjectId` which MongoDB generated for our `_id` field can be selected like so:
 
-	db.unicorns.find(
-		{_id: ObjectId("TheObjectId")})
+	db.unicorns.find({_id: ObjectId("TheObjectIdString")})
 
 ## In This Chapter ##
 We haven't looked at the `update` command yet, or some of the fancier things we can do with `find`. However, we did get MongoDB up and running, looked briefly at the `insert` and `remove` commands (there isn't much more than what we've seen). We also introduced `find` and saw what MongoDB `selectors` were all about. We've had a good start and laid a solid foundation for things to come. Believe it or not, you actually know most of what you need to know to get started with MongoDB - it really is meant to be quick to learn and easy to use. I strongly urge you to play with your local copy before moving on. Insert different documents, possibly in new collections, and get familiar with different selectors. Use `find`, `count` and `remove`. After a few tries on your own, things that might have seemed awkward at first will hopefully fall into place.
