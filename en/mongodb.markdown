@@ -3,7 +3,7 @@
 ## License ##
 The Little MongoDB Book book is licensed under the Attribution-NonCommercial 3.0 Unported license. **You should not have paid for this book.**
 
-You are basically free to copy, distribute, modify or display the book. However, we ask that you always attribute the book to its original author - Karl Seguin - and do not use it for commercial purposes.
+You are basically free to copy, distribute, modify or display the book. However, please always attribute the book to its original author - Karl Seguin - and do not use it for commercial purposes.
 
 You can see the full text of the license at:
 
@@ -18,14 +18,13 @@ His blog can be found at <http://openmymind.net>, and he tweets via [@karlseguin
 
 
 ## About MongoDB Inc ##
-MongoDB Inc is the company behind MongoDB database platform. From its first pull request by Dwight Merriman on October 19, 2007, MongoDB has grown into an international organization with a wide range of products and services.  AK-TODO: consider few sentences about maintaining MongoDB server, hosting Atlas DaaS, and other products with link to more info
+MongoDB Inc is the company behind MongoDB database platform. From its first pull request by Dwight Merriman on October 19, 2007, MongoDB has grown into an international organization with a wide range of products and services.  MongoDB Inc maintains and enhances MongoDB database platform, MongoDB drivers, provides MongoDB Atlas Database as a Service, and other products.
 
 ## Latest Version ##
-This version was updated for MongoDB 6.0 by Asya Kamsky, Rachelle Palmer, and Tony Sansone.  The latest source of this book is available at:
+This version was updated for MongoDB 6.0 by Asya Kamsky.  The latest source of this book is available at:
 
-<http://github.com/karlseguin/the-little-mongodb-book>.
+<http://github.com/mongodb-developer/the-little-mongodb-book>.
 
-// AK-TODO: consider re-homing at `mongodb-developer` repo 
 
 # Introduction #
 
@@ -77,7 +76,7 @@ To get started, there are six simple concepts we need to understand.
 
 To recap, MongoDB is made up of `databases` which contain `collections`. A `collection` is made up of `documents`. Each `document` is made up of `fields`. `Collections` can be `indexed`, which improves query and sorting performance. Finally, when we get data from MongoDB we usually do so through a `cursor` whose actual execution is delayed until necessary.
 
-Why use new terminology (collection vs. table, document vs. row and field vs. column)? Is it just to make things more complicated? The truth is that while these concepts are similar to their relational database counterparts, they are not identical. The core difference comes from the fact that relational databases define `columns` at the `table` level whereas a document-oriented database defines its `fields` at the `document` level. That is to say that each `document` within a `collection` can have its own unique set of `fields`.  As such, a `collection` is a dumbed down container in comparison to a `table`, while a `document` has a lot more information than a `row`.
+Why use new terminology (collection vs. table, document vs. row, and field vs. column)? Is it just to make things more complicated? The truth is that while these concepts are similar to their relational database counterparts, they are not identical. The core difference comes from the fact that relational databases define `columns` at the `table` level whereas a document-oriented database defines its `fields` at the `document` level. That is to say that each `document` within a `collection` can have its own unique set of `fields`.  As such, a `collection` is a dumbed down container in comparison to a `table`, while a `document` has a lot more information than a `row`.
 
 Although this is important to understand, don't worry if things aren't yet clear. It won't take more than a couple of inserts to see what this truly means. Ultimately, the point is that a collection isn't strict about what goes in it (its schema is flexible/dynamic). Fields are tracked with each individual document. The benefits and drawbacks of this will be explored in a future chapter.
 
@@ -181,24 +180,15 @@ We haven't looked at the `update` command yet, or some of the fancier things we 
 In chapter 1 we introduced three of the four CRUD (create, read, update and delete) operations. This chapter is dedicated to the one we skipped over: `update`. `Update` has a few surprising behaviors, which is why we dedicate a chapter to it.
 
 ## Update: Replace Versus `$set` ##
-In its simplest form, `update` takes two parameters: the selector (where) to use and what updates to apply to fields. If Roooooodles had gained a bit of weight, you might expect that we should execute:
+In its simplest form, `update` command takes two parameters: the selector (where) to use and what updates to apply to fields. If Roooooodles had gained a bit of weight, you might expect that we should execute:
 
-	db.unicorns.updateOne({name: 'Roooooodles'}, {weight: 590})
+	db.unicorns.update({name: 'Roooooodles'}, {weight: 590});
+	db.unicorns.find({name: 'Roooooodles'});
 
-(If you've played with your `unicorns` collection and it doesn't have the original data anymore, go ahead and `remove` all documents and re-insert from the code in chapter 1.)
+Now, when we look at the updated record, we should discover the first surprise of `update`. No document is found because the second parameter we supplied didn't have any update operators, and therefore it was used to **replace** the original document. In other words, the `update` found a document by `name` and replaced the entire document with the new document (the second parameter). There is no equivalent functionality to this in SQL's `update` command. In some situations, this is ideal and can be leveraged for some truly dynamic updates. However, when you want to change the value of one, or a few fields, you must use MongoDB's `$set` operator. Go ahead and run this update to reset the lost fields:
 
-Now, if we look at the updated record:
-
-	db.unicorns.find({name: 'Roooooodles'})
-
-You should discover the first surprise of `update`. No document is found because the second parameter we supplied didn't have any update operators, and therefore it was used to **replace** the original document. In other words, the `update` found a document by `name` and replaced the entire document with the new document (the second parameter). There is no equivalent functionality to this in SQL's `update` command. In some situations, this is ideal and can be leveraged for some truly dynamic updates. However, when you want to change the value of one, or a few fields, you must use MongoDB's `$set` operator. Go ahead and run this update to reset the lost fields:
-
-	db.unicorns.updateOne({weight: 590}, {$set: {
-		name: 'Roooooodles',
-		dob: ISODate("1979-08-18T18:44"),
-		loves: ['apple'],
-		gender: 'm',
-		vampires: 99}})
+	db.unicorns.update({weight: 590}, {$set: {name: 'Roooooodles', 
+	    dob: ISODate("1979-08-18T18:44"), loves: ['apple'], gender: 'm', vampires: 99}})
 
 This won't overwrite the new `weight` since we didn't specify it. Now if we execute:
 
@@ -207,6 +197,8 @@ This won't overwrite the new `weight` since we didn't specify it. Now if we exec
 We get the expected result. Therefore, the correct way to have updated the weight in the first place is:
 
 	db.unicorns.updateOne({name: 'Roooooodles'}, {$set: {weight: 590}})
+	
+Stick to using shell helper `updateOne` to prevent accidental replacement operations, and use `replaceOne` to replace the entire document.
 
 ## Update Operators ##
 In addition to `$set`, we can leverage other operators to do some nifty things. All update operators work on fields - so your entire document won't be wiped out. For example, the `$inc` operator is used to increment a field by a certain positive or negative amount. If Pilot was incorrectly awarded a couple vampire kills, we could correct the mistake by executing:
@@ -238,12 +230,11 @@ Since no documents exist with a field `page` equal to `unicorns`, a new document
 	db.hits.find();
 
 ## Multiple Updates ##
-The final surprise `update` has to offer is that, by default, it'll update a single document, which is why the shell helper is called `updateOne`. So far, for the examples we've looked at, this might seem logical. However, if you executed something like:
+The final surprise `update` has to offer is that, by default, it'll update a single document, which is why the shell helper is called `updateOne`. For the examples we've looked at so far, this might seem logical. However, if you an update like this:
 
 	db.unicorns.updateOne({}, {$set: {vaccinated: true }});
-	db.unicorns.find({vaccinated: true});
 
-You might want to find all of your precious unicorns to be vaccinated. To get the behavior you desire, use `updateMany` helper which executes the `update` command with the `multi` option set to true:
+you might want to find all of your precious unicorns to be vaccinated. To get that behavior, use `updateMany` helper which executes the `update` command with the `multi` option set to true:
 
 	db.unicorns.updateMany({}, {$set: {vaccinated: true }});
 	db.unicorns.find({vaccinated: true});
@@ -263,8 +254,11 @@ By default, the `_id` field is always returned. We can explicitly exclude it by 
 
 Aside from the `_id` field, you cannot mix and match inclusion and exclusion. If you think about it, that actually makes sense. You either want to select or exclude one or more fields explicitly.
 
+## Cursors ##
+A few times now I've mentioned that `find` returns a cursor whose execution is delayed until needed. However, what you've no doubt observed from the shell is that `find` executes immediately. This is a behavior of the shell only which automatically iterates over the cursor and returns documents.  In drivers, you would have to use `getNext()` method to fetch documents from the cursor yourself.
+
 ## Ordering ##
-A few times now I've mentioned that `find` returns a cursor whose execution is delayed until needed. However, what you've no doubt observed from the shell is that `find` executes immediately. This is a behavior of the shell only. We can observe the true behavior of `cursors` by looking at one of the methods we can chain to `find`. The first that we'll look at is `sort`. We specify the fields we want to sort on as a JSON document, using 1 for ascending and -1 for descending. For example:
+ We can chain various methods to the cursor returned from `find`. The first that we'll look at is `sort`. We specify the fields we want to sort on as a JSON document, using 1 for ascending and -1 for descending. For example:
 
 	//heaviest unicorns first
 	db.unicorns.find().sort({weight: -1})
@@ -274,26 +268,61 @@ A few times now I've mentioned that `find` returns a cursor whose execution is d
 
 As with a relational database, MongoDB can use an index for sorting. We'll look at indexes in more detail later on. However, you should know that MongoDB limits the size of your sort without an index. That is, if you try to sort a very large result set which can't use an index, you'll get an error. Some people see this as a limitation. In truth, I wish more databases had the capability to refuse to run unoptimized queries. (I won't turn every MongoDB drawback into a positive, but I've seen enough poorly optimized databases that I sincerely wish they had a strict-mode.)
 
-## Paging ##
-Paging results can be accomplished via the `limit` and `skip` cursor methods. To get the second and third heaviest unicorn, we could do:
+## Limiting Results ##
+Limiting results can be accomplished via the `limit` cursor method. To get the top three heaviest unicorn, we could do:
 
-	db.unicorns.find().sort({weight: -1}).skip(1).limit(2)
+	db.unicorns.find().sort({weight: -1}).limit(3)
 
-Using `limit` in conjunction with `sort`, can be a way to avoid running into problems when sorting on non-indexed fields. # AK-TODO remove pagination reference?
+Using `limit` can be a way to avoid running into problems when sorting on non-indexed fields.
 
 ## Count ##
-The shell makes it possible to execute a `count` directly on a collection, such as: AK-TODO replace with countDocuments and estimatedCount maybe?
+The shell makes it possible to execute a `count` directly on a collection, such as: 
 
-	db.unicorns.count({vampires: {$gt: 50}})
+	db.unicorns.countDocuments({vampires: {$gt: 50}})
 
-In reality, `count` is actually a `cursor` method, the shell simply provides a shortcut. Drivers which don't provide such a shortcut need to be executed like this (which will also work in the shell):
-
-	db.unicorns.find({vampires: {$gt: 50}}).count()
+In reality, `countDocuments` is actually a special method that translates into an aggregation, we will learn more about aggregations in the next chapter. All drivers provide the same helper methods for such common operations.
 
 ## In This Chapter ##
 Using `find` and `cursors` is a straightforward proposition. There are a few additional commands that we'll either cover in later chapters or which only serve edge cases, but, by now, you should be getting pretty comfortable working in the mongo shell and understanding the fundamentals of MongoDB.
 
-# Chapter 4 - Data Modeling #
+# Chapter 6 - Aggregating Data #
+
+## Aggregation Pipeline ##
+Aggregation pipeline gives you a way to transform and combine documents in your collection.  You do it by passing the documents through a pipeline that's somewhat analogous to the Unix "pipe" where you send output from one command to another to a third, etc.
+
+The simplest aggregation you are probably already familiar with is the SQL `group by` expression.  We already saw the simple `countDocuments()` method which turns out to be equivalent to grouping all documents to get their count, but what if we want to see how many unicorns are male and how many are female?
+
+	db.unicorns.aggregate([{$group:{_id:'$gender', total: {$sum:1}}}])
+
+In the shell we have the `aggregate` helper which takes an array of pipeline operators that are called "stages".  For a simple count grouped by something, we only need one such stage and it's called `$group`.   This is the exact analog of `GROUP BY` in SQL where we create a new document with `_id` field indicating what field we are grouping by (here it's `gender`) and other fields usually getting assigned results of some aggregation, in this case we `$sum` 1 for each document that matches a particular gender.  You probably noticed that the `_id` field was assigned `'$gender'` and not `'gender'` - the `'$'` before a field name indicates that the value of this field from incoming document will be substituted.
+
+What are some of the other pipeline operators or stages that we can use?  The most common one to use before (and frequently after) `$group` would be `$match` - this is exactly like the `find` method and it allows us to aggregate only a matching subset of our documents, or to exclude some documents from our result.
+
+	db.unicorns.aggregate([{$match: {weight:{$lt:600}}},
+		{$group: {_id:'$gender', total:{$sum:1}, avgVamp:{$avg:'$vampires'}}},
+		{$sort:{avgVamp:-1}} ])
+
+Here we introduced another pipeline operator `$sort` which does exactly what you would expect, along with it we also have stages `$skip` and `$limit`.  We also used a `$group` operator `$avg` along with `$sum` which we already saw in the first example.
+
+MongoDB arrays are powerful and they don't stop us from being able to aggregate on values that are stored inside of them.  We do sometimes need to be able to "flatten" them to properly count everything:
+
+	db.unicorns.aggregate([{$unwind:'$loves'},
+     	{$group: {_id:'$loves', total:{$sum:1}, unicorns:{$addToSet:'$name'}}},
+	  	{$sort:{total:-1}}, {$limit:1} ])
+
+Here we will find out which single food item is loved by the most unicorns and we will also get the list of names of all the unicorns that love it.  `$sort` and `$limit` in combination allow you to get answers to "top N" types of questions.
+
+There are other powerful pipeline operator which allow you to transform values of fields as well as add (or remove) fields. Aggregation stages can use many different expressions which allows you to create or calculate new fields based on values in existing fields. For example, you can use math operators to add together values of several fields before finding out the average, or you can use string operators to create a new field that's a concatenation of some existing fields.  There is even expressions that allow you to execute nearly arbitrary Javascript - though doing so would be less performant than sticking to native server expressions and operators.
+
+This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`.  You can also combine data from multiple pipelines using `$unionWith` - somewhat analogous with SQL UNION. 
+
+## Aggregation Output ##
+Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 3) or it can write your results into a new collection using the `$out` pipeline operator. Using `$merge` pipeline stage you can output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents. You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  For more extensive collection of examples, take a look at [Practical MongoDB Aggregations eBook](https://www.practical-mongodb-aggregations.com/). Keep in mind that both Compass GUI and Atlas web-based UI include aggregation pipeline builder to help you write and debug powerful pipelines.
+
+## In This Chapter ##
+In this chapter we covered MongoDB's [aggregation capabilities](http://docs.mongodb.org/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group and analyze data. With addition of user defined functions, its capabilities can be as boundless as any code you can write in JavaScript.
+
+# Chapter 5 - Data Modeling #
 Let's shift gears and have a more abstract conversation about MongoDB. Explaining a few new terms and some new syntax is a trivial task. Having a conversation about modeling with a new paradigm isn't as easy. The truth is that most of us are still finding out what works and what doesn't when it comes to modeling with these new technologies. It's a conversation we can start having, but ultimately you'll have to practice and learn on real code.
 
 Out of all NoSQL databases, document-oriented databases are probably the most similar to relational databases - at least when it comes to modeling. However, the differences that exist are important.
@@ -308,8 +337,10 @@ Without knowing anything else, to live in a world with fewer joins, we have to d
 Now let's add a couple employees and set their manager as `Leto`:
 
 	db.employees.insertMany([
-	  {_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', manager: ObjectId("4d85c7039ab0fd70a117d730")},
-     {_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', manager: ObjectId("4d85c7039ab0fd70a117d730")} ]);
+	  {_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', 
+	      manager: ObjectId("4d85c7039ab0fd70a117d730")},
+     {_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', 
+         manager: ObjectId("4d85c7039ab0fd70a117d730")} ]);
 
 
 (It's worth repeating that the `_id` can be any unique value. Since you'd likely use an `ObjectId` in real life, we'll use them here as well.)
@@ -318,12 +349,14 @@ Of course, to find all of Leto's employees, one simply executes:
 
 	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
 
-There's nothing magical here. In the worst cases, most of the time, not using a join will merely require an extra query (likely indexed).  Having said all that, MongoDB does provide `$lookup` stage in its aggregation framework which we will cover in a later chapter.
+There's nothing magical here. In the worst cases, most of the time, not using a join will merely require an extra query (likely indexed).  Having said all that, MongoDB does provide `$lookup` stage in its aggregation framework which we saw in the previous chapter.
 
 ## Arrays and Embedded Documents ##
 Just because MongoDB doesn't have extensive support for joins doesn't mean it doesn't have a few tricks up its sleeve. Remember when we saw that MongoDB supports arrays as first class objects of a document? It turns out that this is incredibly handy when dealing with many-to-one or many-to-many relationships. As a simple example, if an employee could have two managers, we could simply store these in an array:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', manager: [ObjectId("4d85c7039ab0fd70a117d730"), ObjectId("4d85c7039ab0fd70a117d732")] })
+	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', 
+	  manager:[ObjectId("4d85c7039ab0fd70a117d730"),
+	           ObjectId("4d85c7039ab0fd70a117d732")]})
 
 Of particular interest is that, for some documents, `manager` can be a scalar value, while for others it can be an array. Our original `find` query will work for both:
 
@@ -333,8 +366,9 @@ You'll quickly find that arrays of values are much more convenient to deal with 
 
 Besides arrays, MongoDB also supports embedded documents. Go ahead and try inserting a document with a nested document, such as:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d734"), name: 'Ghanima',
-		family: {mother: 'Chani', father: 'Paul', brother: ObjectId("4d85c7039ab0fd70a117d730")}})
+	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d734"), name: 'Ghanima',
+	 family: {mother: 'Chani', father: 'Paul', 
+	          brother: ObjectId("4d85c7039ab0fd70a117d730")}})
 
 In case you are wondering, embedded documents can be queried using a dot-notation:
 
@@ -344,12 +378,10 @@ We'll briefly talk about where embedded documents fit and how you should use the
 
 Combining the two concepts, we can even embed arrays of documents:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d735"),
-		name: 'Chani',
-		family: [ 
-           {relation:'mother',name: 'Chani'},
-           {relation:'father',name: 'Paul'},
-           {relation:'brother', name: 'Duncan'}]})
+	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d735"), name: 'Chani',
+		family: [ {relation:'mother', name: 'Chani'},
+                 {relation:'father', name: 'Paul'},
+                 {relation:'brother', name: 'Duncan'}]})
 
 
 ## Denormalization ##
@@ -365,9 +397,10 @@ Arrays of ids can be a useful strategy when dealing with one-to-many or many-to-
 First, you should know that an individual document is currently limited to 16 megabytes in size. Knowing that documents have a size limit, though quite generous, gives you some idea of how they are intended to be used. At this point, it seems like most developers lean heavily on manual references for most of their relationships. Embedded documents are frequently leveraged, but mostly for smaller pieces of data which we want to always pull with the parent document. A real world example may be to store an `addresses` array of documents with each user, something like:
 
 	db.users.insert({name: 'leto',
-		email: 'leto@dune.gov',
-		addresses: [{street: "1633 Broadway", city: "New York", state:"NY",zip:"10019"},
-		            {street: "499 Hamilton St", city: "Palo Alto", state:"CA",zip:"94301"}]})
+	  email: 'leto@dune.gov',
+	  addresses: [
+	     {street: "1633 Broadway", city: "New York", state:"NY",zip:"10019"},
+	     {street: "499 Hamilton St", city: "Palo Alto", state:"CA",zip:"94301"}]})
 
 This doesn't mean you should underestimate the power of embedded documents or write them off as something of minor utility. Having your data model map directly to your objects makes things a lot simpler and often removes the need to join. This is especially true when you consider that MongoDB lets you query and index fields of an embedded documents and arrays.
 
@@ -381,7 +414,7 @@ There's no hard rule (well, aside from 16MB). Play with different approaches and
 ## In This Chapter ##
 Our goal in this chapter was to provide some helpful guidelines for modeling your data in MongoDB, a starting point, if you will. Modeling in a document-oriented system is different, but not too different, than in a relational world. You have more flexibility and one constraint, but for a new system, things tend to fit quite nicely. The only way you can go wrong is by not trying.
 
-# Chapter 5 - When To Use MongoDB #
+# Chapter 6 - When To Use MongoDB #
 By now you should have a feel for where and how MongoDB might fit into your existing system. There are enough new and competing storage technologies that it's easy to get overwhelmed by all of the choices.
 
 For me, the most important lesson, which has nothing to do with MongoDB, is that you no longer have to rely on a single solution for dealing with your data. No doubt, a single solution has obvious advantages, and for a lot projects - possibly even most - a single solution is the sensible approach. The idea isn't that you *must* use different technologies, but rather that you *can*. Only you know whether the benefits of introducing a new solution outweigh the costs.
@@ -440,48 +473,13 @@ Of course, parallelizing data processing isn't something relational databases ex
 A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. This is a feature best explained via some visual aids, so I invite you to try the [5 minute geospatial interactive tutorial](http://mongly.openmymind.net/geo/index), if you want to learn more.  TODO this is not there any longer - is there another feature for this? or can we write one ourselves?)
 
 ## Tools and Maturity ##
-You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, support for base-10 floating point numbers was only added in version 3.4, and there is still no support for SOMETHING HERE?  AK-TODO
+You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, support for base-10 floating point numbers was only added in version 3.4, and there is still no support for SOMETHING HERE?  AK-TODO merge into Performance chapter?
 
 On the positive side, drivers exist for a great many languages, the protocol is modern and simple, and development is happening at blinding speeds. MongoDB is in production at enough companies that concerns about maturity, while valid, are quickly becoming a thing of the past.
 
 ## In This Chapter ##
 The message from this chapter is that MongoDB, in most cases, can replace a relational database. It's much simpler and straightforward; it's faster and generally imposes fewer restrictions on application developers. The addition of transactions addressed a legitimate and serious concern. So, when people ask *where does MongoDB sit with respect to the new data storage landscape?* the answer is simple: **right in the middle**.
 
-# Chapter 6 - Aggregating Data #
-
-## Aggregation Pipeline ##
-Aggregation pipeline gives you a way to transform and combine documents in your collection.  You do it by passing the documents through a pipeline that's somewhat analogous to the Unix "pipe" where you send output from one command to another to a third, etc.
-
-The simplest aggregation you are probably already familiar with is the SQL `group by` expression.  We already saw the simple `count()`  method, but what if we want to see how many unicorns are male and how many are female?
-
-	db.unicorns.aggregate([{$group:{_id:'$gender', total: {$sum:1}}}])
-
-In the shell we have the `aggregate` helper which takes an array of pipeline operators.  For a simple count grouped by something, we only need one such operator and it's called `$group`.   This is the exact analog of `GROUP BY` in SQL where we create a new document with `_id` field indicating what field we are grouping by (here it's `gender`) and other fields usually getting assigned results of some aggregation, in this case we `$sum` 1 for each document that matches a particular gender.  You probably noticed that the `_id` field was assigned `'$gender'` and not `'gender'` - the `'$'` before a field name indicates that the value of this field from incoming document will be substituted.
-
-What are some of the other pipeline operators that we can use?  The most common one to use before (and frequently after) `$group` would be `$match` - this is exactly like the `find` method and it allows us to aggregate only a matching subset of our documents, or to exclude some documents from our result.
-
-	db.unicorns.aggregate([{$match: {weight:{$lt:600}}},
-		{$group: {_id:'$gender',  total:{$sum:1}, avgVamp:{$avg:'$vampires'}}},
-		{$sort:{avgVamp:-1}} ])
-
-Here we introduced another pipeline operator `$sort` which does exactly what you would expect, along with it we also get `$skip` and `$limit`.  We also used a `$group` operator `$avg`.
-
-MongoDB arrays are powerful and they don't stop us from being able to aggregate on values that are stored inside of them.  We do sometimes need to be able to "flatten" them to properly count everything:
-
-	db.unicorns.aggregate([{$unwind:'$loves'},
-     	{$group: {_id:'$loves',  total:{$sum:1}, unicorns:{$addToSet:'$name'}}},
-	  	{$sort:{total:-1}},
-	  	{$limit:1} ])
-
-Here we will find out which food item is loved by the most unicorns and we will also get the list of names of all the unicorns that love it.  `$sort` and `$limit` in combination allow you to get answers to "top N" types of questions.
-
-There are other powerful pipeline operator which allow you to transform values of fields as well as add (or remove) fields.  AK-TODO how to list [`$project`](http://docs.mongodb.org/manual/reference/operator/aggregation/project/#pipe._S_project) (analogous to the projection we can specify to `find`) which allows you not just to include certain fields, but to create or calculate new fields based on values in existing fields.  For example, you can use math operators to add together values of several fields before finding out the average, or you can use string operators to create a new field that's a concatenation of some existing fields.
-
-This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`. Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 1) or it can write your results into a new collection using the `$out` pipeline operator.  In 4.2 aggregation output options got more powerful with a new stage `$merge` which allows output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents.  You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  AK-TODO include link to Paul Done's agg e-book? In addition both Compass GUI and Atlas web-based UI include aggregation pipeline builder (link) to help you write and debug powerful pipelines blah blah.
-AK-TODO sentence about UDF added to Agg is? since I mention it in chapter summary...
-
-## In This Chapter ##
-In this chapter we covered MongoDB's [aggregation capabilities](http://docs.mongodb.org/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group and analyze data. With addition of user defined functions in 4.4 its capabilities can be as boundless as any code you can write in JavaScript.
 
 # Chapter 7 - Performance and Tools #
 In this last chapter, we look at a few performance topics as well as some of the tools available to MongoDB developers. We won't dive deeply into either topic, but we will examine the most important aspects of each.
@@ -577,6 +575,9 @@ Note that `mongoexport` and `mongoimport` cannot always represent your data full
 
 ## In This Chapter ##
 In this chapter we looked at various commands, tools and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simple to use.
+
+# Chapter 8 - Security #
+A short chapter on security stuff
 
 # Conclusion #
 You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.org/) has a lot of useful information. The official AK-TODO replace with reference to community site [MongoDB Community Forums](https://www.mongodb.com/community/forums/) are a great place to ask questions.
