@@ -3,26 +3,19 @@
 ## License ##
 The Little MongoDB Book book is licensed under the Attribution-NonCommercial 3.0 Unported license. **You should not have paid for this book.**
 
-You are basically free to copy, distribute, modify or display the book. However, please always attribute the book to its original author - Karl Seguin - and do not use it for commercial purposes.
-
-You can see the full text of the license at:
-
+You are basically free to copy, distribute, modify or display the book. However, please always attribute the book to its original author - Karl Seguin - and do not use it for commercial purposes. You can see the full text of the license at:
 <http://creativecommons.org/licenses/by-nc/3.0/legalcode>
 
 ## About The Original Author ##
-Karl Seguin is a developer with experience across various fields and technologies. He's an expert .NET and Ruby developer.  He's a semi-active contributor to OSS projects, a technical writer and an occasional speaker. With respect to MongoDB, he was a core contributor to the C# MongoDB library NoRM, wrote the interactive tutorial [mongly](http://openmymind.net/mongly/) as well as the [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). His free service for casual game developers, [mogade.com](http://mogade.com/), is powered by MongoDB.
+Karl Seguin is a developer with experience across various fields and technologies. He's an expert .NET and Ruby developer. He's a semi-active contributor to OSS projects, a technical writer and an occasional speaker. With respect to MongoDB, he was a core contributor to the C# MongoDB library NoRM, wrote the interactive tutorial `mongly` as well as the [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). His free service for casual game developers, `mogade.com` was powered by MongoDB. Karl has since written [The Little Redis Book](http://openmymind.net/2012/1/23/The-Little-Redis-Book/)
 
-Karl has since written [The Little Redis Book](http://openmymind.net/2012/1/23/The-Little-Redis-Book/)
-
-His blog can be found at <http://openmymind.net>, and he tweets via [@karlseguin](http://twitter.com/karlseguin)
-
+His blog can be found at <http://openmymind.net>, and he tweets via `@karlseguin`
 
 ## About MongoDB Inc ##
 MongoDB Inc is the company behind MongoDB database platform. From its first pull request by Dwight Merriman on October 19, 2007, MongoDB has grown into an international organization with a wide range of products and services.  MongoDB Inc maintains and enhances MongoDB database platform, MongoDB drivers, provides MongoDB Atlas Database as a Service, and other products.
 
 ## Latest Version ##
 This version was updated for MongoDB 6.0 by Asya Kamsky.  The latest source of this book is available at:
-
 <http://github.com/mongodb-developer/the-little-mongodb-book>.
 
 
@@ -45,16 +38,15 @@ This does bring up the first thing you should know about MongoDB: its drivers. M
 
 As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that you might come up with on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up.  You'll need to have a MongoDB server running somewhere, as well as a MongoDB client (CLI or GUI) running locally.
 
-For the client part, install either MongoDB Shell from [the official page](https://www.mongodb.com/docs/mongodb-shell/) or if you prefer GUI to command line shell, you can use [MongoDB Compass](https://www.mongodb.com/try/download/compass), an open source GUI for MongoDB. MongoDB Compass has the shell built-in so you can switch between using GUI and command line as you wish.
+For the client part, install either the MongoDB Shell from [the official page](https://www.mongodb.com/docs/mongodb-shell/) or if you prefer GUI to command line shell, you can use [MongoDB Compass](https://www.mongodb.com/try/download/compass), an open source GUI for MongoDB. MongoDB Compass has the shell built-in so you can switch between using GUI and command line as you wish.
 
-To run the server, if you don't want to (or can't) install MongoDB server locally, you can sign up for a free hosted MongoDB cluster in [Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
+To run the server, if you don't want to (or can't) install MongoDB server locally, you can sign up for a free hosted MongoDB cluster in [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) - follow the [getting started directions](https://docs.atlas.mongodb.com/getting-started/) there to connect to your cluster.
 
 If you can run MongoDB locally and prefer to do that, follow instructions for your operating system on the [official installation manual page](https://www.mongodb.com/docs/manual/administration/install-community/).
 
 Once you have `mongod` running locally or a connection string to your Atlas MongoDB cluster, connect to it from your MongoDB Shell or Compass.
 
-Try entering `db.version()` at the prompt to make sure everything's working as it should. Hopefully you'll see the server version number you connected to.
-
+Try entering `db.version()` at the prompt to make sure everything's working as it should. Hopefully you'll see the server version number you connected to. 
 
 
 # Chapter 1 - The Basics #
@@ -111,33 +103,33 @@ And, again use `find` to list the documents. Once we know a bit more, we'll disc
 ## Mastering Selectors ##
 In addition to the six concepts we've explored, there's one practical aspect of MongoDB you need to have a good grasp of before moving to more advanced topics: query selectors or predicates. A MongoDB query predicate is like the `WHERE` clause of an SQL statement. As such, you use it when finding, counting, updating and removing documents from collections. A selector is a JSON object, the simplest of which is `{}` which matches all documents. If we wanted to find all female unicorns, we could use `{gender:'f'}`.
 
-Before delving too deeply into selectors, let's set up some data to play with. First, remove what we've put so far in the `unicorns` collection via: `db.unicorns.remove({})`. Now, issue the following inserts to get some data we can play with (I suggest you copy and paste this):
+Before delving too deeply into selectors, let's set up some data to play with. First, remove what we've put so far in the `unicorns` collection via: `db.unicorns.remove({})`. Now, copy and paste following inserts to get some data we can play with:
 
 	db.unicorns.insertMany([
-      {name: 'Horny', dob: ISODate("1992-03-13T07:47"), 
-          loves: ['carrot','papaya'], weight: 600, gender: 'm', vampires: 63}, 
-      {name: 'Aurora', dob: ISODate("1991-01-24T13:00"), 
-          loves: ['carrot', 'grape'], weight: 450, gender: 'f', vampires: 43},
-      {name: 'Unicrom', dob: ISODate("1973-02-09T22:10"), 
-          loves: ['energon', 'redbull'], weight: 984, gender: 'm', vampires: 182},
-      {name: 'Roooooodles', dob: ISODate("1979-08-18T18:44"), 
-          loves: ['apple'], weight: 575, gender: 'm', vampires: 99},
-      {name: 'Solnara', dob: ISODate("1985-07-04T02:01"), 
-          loves:['apple', 'carrot', 'chocolate'], weight:550, gender:'f', vampires:80},
-      {name:'Ayna', dob: ISODate("1998-03-07T08:30"), 
-          loves: ['strawberry', 'lemon'], weight: 733, gender: 'f', vampires: 40},
-      {name:'Kenny', dob: ISODate("1997-07-01T10:42"), 
-          loves: ['grape', 'lemon'], weight: 690, gender: 'm', vampires: 39},
-      {name: 'Raleigh', dob: ISODate("2005-05-03T00:57"), 
-          loves: ['apple', 'sugar'], weight: 421, gender: 'm', vampires: 2},
-      {name: 'Leia', dob: ISODate("2001-10-08T14:53"), 
-          loves: ['apple', 'watermelon'], weight: 601, gender: 'f', vampires: 33},
-      {name: 'Pilot', dob: ISODate("1997-03-01T05:03"), 
-          loves: ['apple', 'watermelon'], weight: 650, gender: 'm', vampires: 54},
-      {name: 'Nimue', dob: ISODate("1999-12-20T00:16:15"), 
-          loves: ['grape', 'carrot'], weight: 540, gender: 'f'},
-      {name: 'Dunx', dob: ISODate("1976-07-18T18:18"), 
-          loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165}
+      {name: 'Horny', dob: ISODate("1992-03-13T07:47"), weight: 600,
+          loves: ['carrot','papaya'], gender: 'm', vampires: 63}, 
+      {name: 'Aurora', dob: ISODate("1991-01-24T13:00"), weight: 450,
+          loves: ['carrot', 'grape'], gender: 'f', vampires: 43},
+      {name: 'Unicrom', dob: ISODate("1973-02-09T22:10"), weight: 984,
+          loves: ['energon', 'redbull'], gender: 'm', vampires: 182},
+      {name: 'Roooooodles', dob: ISODate("1979-08-18T18:44"), weight: 575,
+          loves: ['apple'], gender: 'm', vampires: 99},
+      {name: 'Solnara', dob: ISODate("1985-07-04T02:01"), weight:550,
+          loves:['apple', 'carrot', 'chocolate'], gender:'f', vampires:80},
+      {name:'Ayna', dob: ISODate("1998-03-07T08:30"), weight: 733,
+          loves: ['strawberry', 'lemon'], gender: 'f', vampires: 40},
+      {name:'Kenny', dob: ISODate("1997-07-01T10:42"), weight: 690,
+          loves: ['grape', 'lemon'], gender: 'm', vampires: 39},
+      {name: 'Raleigh', dob: ISODate("2005-05-03T00:57"), weight: 421,
+          loves: ['apple', 'sugar'], gender: 'm', vampires: 2},
+      {name: 'Leia', dob: ISODate("2001-10-08T14:53"), weight: 601,
+          loves: ['apple', 'watermelon'], gender: 'f', vampires: 33},
+      {name: 'Pilot', dob: ISODate("1997-03-01T05:03"), weight: 650,
+          loves: ['apple', 'watermelon'], gender: 'm', vampires: 54},
+      {name: 'Nimue', dob: ISODate("1999-12-20T00:16:15"), weight: 540,
+          loves: ['grape', 'carrot'], gender: 'f'},
+      {name: 'Dunx', dob: ISODate("1976-07-18T18:18"), weight: 704,
+          loves: ['grape', 'watermelon'], gender: 'm', vampires: 165}
     ]);
 
 Now that we have data, we can master selectors. `{field: value}` is used to find any documents where `field` is equal to `value`. `{field1: value1, field2: value2}` is how we do an `and` statement. The special `$lt`, `$lte`, `$gt`, `$gte` and `$ne` are used for less than, less than or equal, greater than, greater than or equal and not equal operations. For example, to get all male unicorns that weigh more than 700 pounds, we could do:
@@ -221,22 +213,22 @@ A mundane example is a hit counter for a website. If we wanted to keep an aggreg
 
 However, if we add the upsert option, the results are quite different:
 
-	db.hits.updateOne({page: 'unicorns'}, {$inc: {hits: 1}}, {upsert:true});
+	db.hits.updateOne({page:'unicorns'}, {$inc:{hits:1}}, {upsert:true});
 	db.hits.find();
 
 Since no documents exist with a field `page` equal to `unicorns`, a new document is inserted. If we execute it a second time, the existing document is updated and `hits` is incremented to 2.
 
-	db.hits.updateOne({page: 'unicorns'}, {$inc: {hits: 1}}, {upsert:true});
+	db.hits.updateOne({page:'unicorns'}, {$inc:{hits:1}}, {upsert:true});
 	db.hits.find();
 
 ## Multiple Updates ##
 The final surprise `update` has to offer is that, by default, it'll update a single document, which is why the shell helper is called `updateOne`. For the examples we've looked at so far, this might seem logical. However, if you an update like this:
 
-	db.unicorns.updateOne({}, {$set: {vaccinated: true }});
+	db.unicorns.updateOne({}, {$set:{vaccinated:true}});
 
 you might want to find all of your precious unicorns to be vaccinated. To get that behavior, use `updateMany` helper which executes the `update` command with the `multi` option set to true:
 
-	db.unicorns.updateMany({}, {$set: {vaccinated: true }});
+	db.unicorns.updateMany({}, {$set:{vaccinated:true}});
 	db.unicorns.find({vaccinated: true});
 
 ## In This Chapter ##
@@ -299,25 +291,25 @@ In the shell we have the `aggregate` helper which takes an array of pipeline ope
 What are some of the other pipeline operators or stages that we can use?  The most common one to use before (and frequently after) `$group` would be `$match` - this is exactly like the `find` method and it allows us to aggregate only a matching subset of our documents, or to exclude some documents from our result.
 
 	db.unicorns.aggregate([{$match: {weight:{$lt:600}}},
-		{$group: {_id:'$gender', total:{$sum:1}, avgVamp:{$avg:'$vampires'}}},
-		{$sort:{avgVamp:-1}} ])
+	   {$group: {_id:'$gender',total:{$sum:1},avgVamp:{$avg:'$vampires'}}},
+	   {$sort:{avgVamp:-1}} ])
 
 Here we introduced another pipeline operator `$sort` which does exactly what you would expect, along with it we also have stages `$skip` and `$limit`.  We also used a `$group` operator `$avg` along with `$sum` which we already saw in the first example.
 
 MongoDB arrays are powerful and they don't stop us from being able to aggregate on values that are stored inside of them.  We do sometimes need to be able to "flatten" them to properly count everything:
 
 	db.unicorns.aggregate([{$unwind:'$loves'},
-     	{$group: {_id:'$loves', total:{$sum:1}, unicorns:{$addToSet:'$name'}}},
-	  	{$sort:{total:-1}}, {$limit:1} ])
+	   {$group:{_id:'$loves',total:{$sum:1},unicorns:{$addToSet:'$name'}}},
+	   {$sort:{total:-1}}, {$limit:1} ])
 
 Here we will find out which single food item is loved by the most unicorns and we will also get the list of names of all the unicorns that love it.  `$sort` and `$limit` in combination allow you to get answers to "top N" types of questions.
 
 There are other powerful pipeline operator which allow you to transform values of fields as well as add (or remove) fields. Aggregation stages can use many different expressions which allows you to create or calculate new fields based on values in existing fields. For example, you can use math operators to add together values of several fields before finding out the average, or you can use string operators to create a new field that's a concatenation of some existing fields.  There is even expressions that allow you to execute nearly arbitrary Javascript - though doing so would be less performant than sticking to native server expressions and operators.
 
-This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`.  You can also combine data from multiple pipelines using `$unionWith` - somewhat analogous with SQL UNION. 
+This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`.  You can also combine data from multiple pipelines using `$unionWith` - somewhat analogous with SQL UNION.
 
 ## Aggregation Output ##
-Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 3) or it can write your results into a new collection using the `$out` pipeline operator. Using `$merge` pipeline stage you can output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents. You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  For more extensive collection of examples, take a look at [Practical MongoDB Aggregations eBook](https://www.practical-mongodb-aggregations.com/). Keep in mind that both Compass GUI and Atlas web-based UI include aggregation pipeline builder to help you write and debug powerful pipelines.
+Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 3) or it can write your results into a new collection using the `$out` pipeline operator. Using `$merge` pipeline stage you can output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents. You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  For more extensive collection of examples, take a look at [Practical MongoDB Aggregations eBook](https://www.practical-mongodb-aggregations.com/). Keep in mind that both Compass GUI and Atlas web-based UI include an aggregation pipeline builder to help you write and debug powerful pipelines.
 
 ## In This Chapter ##
 In this chapter we covered MongoDB's [aggregation capabilities](http://docs.mongodb.org/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group and analyze data. With addition of user defined functions, its capabilities can be as boundless as any code you can write in JavaScript.
@@ -332,43 +324,37 @@ The first and most fundamental difference that you'll need to get comfortable wi
 
 Without knowing anything else, to live in a world with fewer joins, we have to do some joins ourselves within our application's code. Essentially we need to issue a second query to `find` the relevant data in a second collection. Setting our data up isn't any different than declaring a foreign key in a relational database. Let's give a little less focus to our beautiful `unicorns` and a bit more time to our `employees`. The first thing we'll do is create an employee (I'm providing an explicit `_id` so that we can build coherent examples)
 
-	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d730"), name: 'Leto'})
+	db.employees.insertOne({_id: 485, name: 'Leto'})
 
 Now let's add a couple employees and set their manager as `Leto`:
 
 	db.employees.insertMany([
-	  {_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', 
-	      manager: ObjectId("4d85c7039ab0fd70a117d730")},
-     {_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', 
-         manager: ObjectId("4d85c7039ab0fd70a117d730")} ]);
+      {_id: 698, name: 'Duncan', manager: 485},
+      {_id: 703, name: 'Moneo', manager: 485} ]);
 
-
-(It's worth repeating that the `_id` can be any unique value. Since you'd likely use an `ObjectId` in real life, we'll use them here as well.)
+(It's worth repeating that the `_id` can be any unique value. You will frequently use an `ObjectId` in real life, but here we will use numeric `_id`.)
 
 Of course, to find all of Leto's employees, one simply executes:
 
-	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: 485})
 
-There's nothing magical here. In the worst cases, most of the time, not using a join will merely require an extra query (likely indexed).  Having said all that, MongoDB does provide `$lookup` stage in its aggregation framework which we saw in the previous chapter.
+There's nothing magical here. In the worst cases, most of the time, not using a join will merely require an extra query (likely indexed). Having said all that, MongoDB does provide `$lookup` stage in its aggregation framework which we saw in the previous chapter.
 
 ## Arrays and Embedded Documents ##
 Just because MongoDB doesn't have extensive support for joins doesn't mean it doesn't have a few tricks up its sleeve. Remember when we saw that MongoDB supports arrays as first class objects of a document? It turns out that this is incredibly handy when dealing with many-to-one or many-to-many relationships. As a simple example, if an employee could have two managers, we could simply store these in an array:
 
-	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', 
-	  manager:[ObjectId("4d85c7039ab0fd70a117d730"),
-	           ObjectId("4d85c7039ab0fd70a117d732")]})
+	db.employees.insertOne({_id: 811, name: 'Siona', manager:[ 485, 698]})
 
 Of particular interest is that, for some documents, `manager` can be a scalar value, while for others it can be an array. Our original `find` query will work for both:
 
-	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: 485})
 
 You'll quickly find that arrays of values are much more convenient to deal with than many-to-many join-tables.
 
 Besides arrays, MongoDB also supports embedded documents. Go ahead and try inserting a document with a nested document, such as:
 
-	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d734"), name: 'Ghanima',
-	 family: {mother: 'Chani', father: 'Paul', 
-	          brother: ObjectId("4d85c7039ab0fd70a117d730")}})
+	db.employees.insertOne({_id: 501, name: 'Ghanima',
+	 family: {mother: 'Chani', father: 'Paul', brother: 485}})
 
 In case you are wondering, embedded documents can be queried using a dot-notation:
 
@@ -378,8 +364,8 @@ We'll briefly talk about where embedded documents fit and how you should use the
 
 Combining the two concepts, we can even embed arrays of documents:
 
-	db.employees.insertOne({_id: ObjectId("4d85c7039ab0fd70a117d735"), name: 'Chani',
-		family: [ {relation:'mother', name: 'Chani'},
+	db.employees.insertOne({_id: 502, name: 'Chani',
+	    family: [{relation:'mother', name: 'Chani'},
                  {relation:'father', name: 'Paul'},
                  {relation:'brother', name: 'Duncan'}]})
 
@@ -387,7 +373,7 @@ Combining the two concepts, we can even embed arrays of documents:
 ## Denormalization ##
 Yet another alternative to using joins is to denormalize your data. Historically, denormalization was reserved for performance-sensitive code, or when data should be snapshotted (like in an audit log). However, with the ever-growing popularity of NoSQL, many of which don't have any support for joins, denormalization as part of normal modeling is becoming increasingly common. This doesn't mean you should duplicate every piece of information in every document. However, rather than letting fear of duplicate data drive your design decisions, consider modeling your data based on what information belongs to what document.
 
-For example, say you are writing a forum application. The traditional way to associate a specific `user` with a `post` is via a `userid` column within `posts`. With such a model, you can't display `posts` without retrieving (joining to) `users`. A possible alternative is simply to store the `name` as well as the `userid` with each `post`. You could even do so with an embedded document, like `user: {id: ObjectId('Something'), name: 'Leto'}`. Yes, if you let users change their name, you may have to update each document (which is one multi-update).
+For example, say you are writing a forum application. The traditional way to associate a specific `user` with a `post` is via a `userid` column within `posts`. With such a model, you can't display `posts` without retrieving (joining to) `users`. A possible alternative is simply to store the `name` as well as the `userid` with each `post`. You could even do so with an embedded document, like `user: {id: ObjectId('Something'), name: 'Karl'}`. Yes, if you let users change their name, you may have to update each document (which is one multi-update).
 
 Adjusting to this kind of approach won't come easy to some. In a lot of cases it won't even make sense to do this. Don't be afraid to experiment with this approach though. It's not only suitable in some circumstances, but it can also be the best way to do it.
 
@@ -396,11 +382,10 @@ Arrays of ids can be a useful strategy when dealing with one-to-many or many-to-
 
 First, you should know that an individual document is currently limited to 16 megabytes in size. Knowing that documents have a size limit, though quite generous, gives you some idea of how they are intended to be used. At this point, it seems like most developers lean heavily on manual references for most of their relationships. Embedded documents are frequently leveraged, but mostly for smaller pieces of data which we want to always pull with the parent document. A real world example may be to store an `addresses` array of documents with each user, something like:
 
-	db.users.insert({name: 'leto',
-	  email: 'leto@dune.gov',
-	  addresses: [
-	     {street: "1633 Broadway", city: "New York", state:"NY",zip:"10019"},
-	     {street: "499 Hamilton St", city: "Palo Alto", state:"CA",zip:"94301"}]})
+	db.users.insert({name: 'leto', email: 'leto@dune.gov', addresses: [
+      {street:"1633 Broadway", city:"New York", state:"NY",zip:"10019"},
+      {street:"499 Hamilton", city:"Palo Alto", state:"CA",zip:"94301"}
+    ]})
 
 This doesn't mean you should underestimate the power of embedded documents or write them off as something of minor utility. Having your data model map directly to your objects makes things a lot simpler and often removes the need to join. This is especially true when you consider that MongoDB lets you query and index fields of an embedded documents and arrays.
 
@@ -414,81 +399,14 @@ There's no hard rule (well, aside from 16MB). Play with different approaches and
 ## In This Chapter ##
 Our goal in this chapter was to provide some helpful guidelines for modeling your data in MongoDB, a starting point, if you will. Modeling in a document-oriented system is different, but not too different, than in a relational world. You have more flexibility and one constraint, but for a new system, things tend to fit quite nicely. The only way you can go wrong is by not trying.
 
-# Chapter 6 - When To Use MongoDB #
-By now you should have a feel for where and how MongoDB might fit into your existing system. There are enough new and competing storage technologies that it's easy to get overwhelmed by all of the choices.
-
-For me, the most important lesson, which has nothing to do with MongoDB, is that you no longer have to rely on a single solution for dealing with your data. No doubt, a single solution has obvious advantages, and for a lot projects - possibly even most - a single solution is the sensible approach. The idea isn't that you *must* use different technologies, but rather that you *can*. Only you know whether the benefits of introducing a new solution outweigh the costs.
-
-With that said, I'm hopeful that what you've seen so far has made you see MongoDB as a general solution. It's been mentioned a couple times that document-oriented databases share a lot in common with relational databases. Therefore, rather than tiptoeing around it, let's simply state that MongoDB should be seen as a direct alternative to relational databases. Where one might see Lucene as enhancing a relational database with full text indexing, or Redis as a persistent key-value store, MongoDB is a central repository for your data.
-
-Notice that I didn't call MongoDB a *replacement* for relational databases, but rather an *alternative*. It's a tool that can do what a lot of other tools can do. Some of it MongoDB does better, some of it MongoDB does worse. Let's dissect things a little further.
-
-## Flexible Schema ##
-An oft-touted benefit of document-oriented database is that they don't enforce a fixed schema. This makes them much more flexible than traditional database tables. I agree that flexible schema is a nice feature, but not for the main reason most people mention.
-
-People talk about "schema-less" as though you'll suddenly start storing a crazy mishmash of data. There are domains and data sets which can really be a pain to model using relational databases, but I see those as edge cases. Schema-less is cool, but most of your data is going to be highly structured. It's true that having an occasional mismatch can be handy, especially when you introduce new features, but in reality it's nothing a nullable column probably wouldn't solve just as well.
-
-For me, the real benefit of dynamic schema is the lack of setup and the reduced friction with OOP. This is particularly true when you're working with a static language. I've worked with MongoDB in both C# and Ruby, and the difference is striking. Ruby's dynamism and its popular ActiveRecord implementations already reduce much of the object-relational impedance mismatch. That isn't to say MongoDB isn't a good match for Ruby, it really is. Rather, I think most Ruby developers would see MongoDB as an incremental improvement, whereas C# or Java developers would see a fundamental shift in how they interact with their data.
-
-Think about it from the perspective of a driver developer. You want to save an object? Serialize it to JSON (technically BSON, but close enough) and send it to MongoDB. There is no property mapping or type mapping. This straightforwardness definitely flows to you, the end developer.
-
-AK-TODO should there be a section or just mention of schema/document validation?  If so where? here?)
-
-## Writes ##
-(AK-TODO check if true, reframe - maybe repurpose this for all special purpose collections?  TimeSeries, etc?) One area where MongoDB can fit a specialized role is in logging. There are two aspects of MongoDB which make writes quite fast. ~~irst, you have an option to send a write command and have it return immediately without waiting for the write to be acknowledged~. You can control the write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-write, giving you a great level of control over write latency and data durability.
-
-(AK-TODO do we want to promote capped collections? Probably not) In addition to these performance factors, log data is one of those data sets which can often take advantage of schema-less collections. Finally, MongoDB has something called a [capped collection](http://docs.mongodb.org/manual/core/capped-collections/). So far, all of the implicitly created collections we've created are just normal collections. We can create a capped collection by using the `db.createCollection` command and flagging it as capped:
-
-	//limit our capped collection to 1 megabyte
-	db.createCollection('logs', {capped: true,
-		size: 1048576})
-
-When our capped collection reaches its 1MB limit, old documents are automatically purged. A limit on the number of documents, rather than the size, can be set using `max`. Capped collections have some interesting properties. For example, you can update a document but it can't change in size. The insertion order is preserved, so you don't need to add an extra index to get proper time-based sorting.  You can "tail" a capped collection the way you tail a file in Unix via `tail -f <filename>` which allows you to get new data as it arrives, without having to re-query it.
-
-If you want to "expire" your data based on time rather than overall collection size, you can use [TTL Indexes](http://docs.mongodb.org/manual/tutorial/expire-data/) where TTL stands for "time-to-live".
-
-## Durability ##
-Prior to version 1.8 (released in 2010), MongoDB did not have single-server durability. That is, a server crash would likely result in lost or corrupt data. The solution had always been to run MongoDB in a multi-server setup (MongoDB supports replication). Journaling was one of the major features added in 1.8. Since version 2.0 MongoDB enables journaling by default, which allows fast recovery of the server in case of a crash or abrupt power loss.  As of version 4.0 you no longer even have the option of disabling journaling.
-
-Durability is only mentioned here because a lot has been made around MongoDB's past lack of single-server durability. This'll likely show up in Google searches for some time to come. Information you find about journaling being a missing feature is simply out of date.
-
-## Full Text Search ##
-(AK-TODO mention Atlas search with Lucene?  Two options, depending on Atlas or not) True full text search capability is a recent addition to MongoDB.  It supports fifteen languages with stemming and stop words. With MongoDB's support for arrays and full text search you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    
-
-## Transactions ##
-MongoDB added full support for ACID transactions in 4.0 (extending it to sharded clusters in 4.2). Before that there were two alternatives, one which is great and still has its place, and the other that was cumbersome but flexible.
-
-The first is its many atomic update operations. These are great, so long as they actually address your problem. We already saw some of the simpler ones, like `$inc` and `$set`. There are also commands like `findAndModify` which can update or delete a document and return it atomically.  When atomicity can be ensured this way, it's preferable to using transactions for speed and overall scalability of the system.
-
-The second, when atomic operations aren't enough, was to fall back to a two-phase commit. A two-phase commit is to transactions what manual dereferencing is to joins. It's a storage-agnostic solution that you do in code. Two-phase commits are actually quite popular in the relational world as a way to implement transactions across multiple databases. AK-TODO check AK-TODO The MongoDB website [had an example](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) AK NO LONGER THERE - remove section? illustrating the most typical example (a transfer of funds). The general idea is that you store the state of the transaction within the actual document being updated atomically and go through the init-pending-commit/rollback steps manually.  This is the case where using MongoDB native multi-document transactions is a great option as they significantly simplify the application code.
-
-TODO short paragraph on transaction details?
-
-## Data Processing ##
-Before version 2.2 MongoDB relied on MapReduce for most data processing jobs. In 2012 as of 2.2 it has added a powerful feature called  [aggregation framework or pipeline](http://docs.mongodb.org/manual/core/aggregation-pipeline/), AK-TODO (remove mapReduce references) and as of 5.0 MapReduce has been deprecated (and internally it actually runs as an aggregation pipeline) so you'll never need to use MapReduce. In the next chapter we'll look at Aggregation Pipeline in detail. For now you can think of it as feature-rich and different ways to `group by` (which is an understatement).  For parallel processing of massive datasets, you may need to rely on something else, such as Hadoop. Thankfully, since the two systems really do complement each other, there's a [MongoDB connector for Hadoop](http://docs.mongodb.org/ecosystem/tools/hadoop/). (should this be instead about other specialized systems, incl Hadoop (like Kafka, etc)?
-
-Of course, parallelizing data processing isn't something relational databases excel at either. There are plans for future versions of MongoDB to be better at handling very large sets of data. AK-TODO Data Lake?
-
-## Geospatial ##
-A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. This is a feature best explained via some visual aids, so I invite you to try the [5 minute geospatial interactive tutorial](http://mongly.openmymind.net/geo/index), if you want to learn more.  TODO this is not there any longer - is there another feature for this? or can we write one ourselves?)
-
-## Tools and Maturity ##
-You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, support for base-10 floating point numbers was only added in version 3.4, and there is still no support for SOMETHING HERE?  AK-TODO merge into Performance chapter?
-
-On the positive side, drivers exist for a great many languages, the protocol is modern and simple, and development is happening at blinding speeds. MongoDB is in production at enough companies that concerns about maturity, while valid, are quickly becoming a thing of the past.
-
-## In This Chapter ##
-The message from this chapter is that MongoDB, in most cases, can replace a relational database. It's much simpler and straightforward; it's faster and generally imposes fewer restrictions on application developers. The addition of transactions addressed a legitimate and serious concern. So, when people ask *where does MongoDB sit with respect to the new data storage landscape?* the answer is simple: **right in the middle**.
-
-
-# Chapter 7 - Performance and Tools #
-In this last chapter, we look at a few performance topics as well as some of the tools available to MongoDB developers. We won't dive deeply into either topic, but we will examine the most important aspects of each.
+# Chapter 6 - Performance #
+In this chapter, we look at a few performance topics as well as some of the tools available to MongoDB developers. We won't dive deeply into either topic, but we will examine the most important aspects of each.
 
 ## Indexes ##
-At the very beginning we saw the `getIndexes` command which shows information on all the indexes in a collection. Indexes in MongoDB work a lot like indexes in a relational database: they help improve query and sorting performance. Indexes are created via `ensureIndex`:
+At the very beginning we saw the `getIndexes` command which shows information on all the indexes in a collection. Indexes in MongoDB work a lot like indexes in a relational database: they help improve query and sorting performance. Indexes are created via `createIndex`:
 
 	// where "name" is the field name
-	db.unicorns.ensureIndex({name: 1});
+	db.unicorns.createIndex({name: 1});
 
 And dropped via `dropIndex`:
 
@@ -496,11 +414,11 @@ And dropped via `dropIndex`:
 
 A unique index can be created by supplying a second parameter and setting `unique` to `true`:
 
-	db.unicorns.ensureIndex({name: 1}, {unique: true});
+	db.unicorns.createIndex({name: 1}, {unique: true});
 
 Indexes can be created on embedded fields (again, using the dot-notation) and on array fields. We can also create compound indexes:
 
-	db.unicorns.ensureIndex({name: 1, vampires: -1});
+	db.unicorns.createIndex({name: 1, vampires: -1});
 
 The direction of your index (1 for ascending, -1 for descending) doesn't matter for a single key index, but it can make a difference for compound indexes when you are sorting on more than one indexed field.
 
@@ -518,14 +436,6 @@ If we change our query to use an index, we'll see that a AK-TODO change all this
 	db.unicorns.explain().find({name: 'Pilot'})
 	
 The `explain()` method can be used with any command that could use an index, like `aggregate`, `update`, etc.
-
-## Replication ##
-MongoDB replication works in some ways similarly to how relational database replication works. All production deployments should be replica sets, which consist of ideally three or more servers that hold the same data.  Writes are sent to a single server, the primary, from where it's asynchronously replicated to every secondary. You can control whether you allow reads to happen on secondaries or not, which can help direct some special queries away from the primary, at the risk of reading slightly stale data. If the primary goes down, one of the secondaries will be automatically elected to be the new primary. Again, MongoDB replication is outside the scope of this book.
-
-## Sharding ##
-MongoDB supports auto-sharding. Sharding is an approach to scalability which partitions your data across multiple servers or clusters. A naive implementation might put all of the data for users with a name that starts with A-M on server 1 and the rest on server 2. Thankfully, MongoDB's sharding capabilities far exceed such a simple algorithm. Sharding is a topic well beyond the scope of this book, but you should know that it exists and that you should consider it, should your needs grow beyond a single replica set.
-
-While replication can help performance somewhat (by isolating long running queries to secondaries, and reducing latency for some other types of queries), its main purpose is to provide high availability. Sharding is the primary method for scaling MongoDB clusters. Combining replication with sharding is the prescribed approach to achieve scaling and high availability.
 
 ## Stats ##
 You can obtain statistics on a database by typing `db.stats()`. Most of the information deals with the size of your database. You can also get statistics on a collection, say `unicorns`, by typing `db.unicorns.stats()`. Most of this information relates to the size of your collection and its indexes.  If you are using Atlas, there are multiple metrics screens showing you the same stats data in graphical format over time.
@@ -552,20 +462,39 @@ You disable the profiler by calling `setProfilingLevel` again but changing the p
 
 AK-TODO mention sampling and that profiling isn't usually for production.  You can also specify a third parameter to indicate a sampling threshold - by default all queries over slow ms will be profiled, also AK-TODO mention profile `filter`
 
-## Backups and Restore ##
-AK-TODO TOOLS ARE NOT SEPARATE PACKAGING Within the MongoDB `bin` folder is a `mongodump` executable. Simply executing `mongodump` will connect to localhost and backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are `--db DBNAME` to back up a specific database and `--collection COLLECTIONNAME` to back up a specific collection. You can then use the `mongorestore` executable, located in the same `bin` folder, to restore a previously made backup. Again, the `--db` and `--collection` can be specified to restore a specific database and/or collection.  `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
+## In This Chapter ##
+In this chapter we looked at various commands, tools and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simple to use.
+
+
+# Chapter 8 - Security and Backups #
+
+## Security ##
+When it was first released, MongoDB did not have secure defaults and relied on the person installing it to follow security best practices to lock down the data from malicious actors.  A lot has changed, and many default settings now only allow open access to the data from `localhost` after installation.  You should follow [documented best practices](https://www.mongodb.com/docs/manual/security/) to set up appropriate roles, users and permissions.  If you decided to use Atlas, security has already been enforced for you, and you have to take positive steps like creating admin user and password, and allowing access to your data only from specific IP addresses.
+
+If you're not using MongoDB Atlas, you will:
+
+- enable access control and specify an authentication mechanism
+- configure role based access-control
+- encrypt communication (TLS/SSL)
+- encrypt and protect data
+- limit network exposure
+- (optionally) audit system activity
+- always run the latest version to be sure any known issues are fixed
+
+## Backup and Restore ##
+When you have production data, you want to make sure that you back it up on regular basis (as well as testing restoring it). There are several approaches to doing backups with MongoDB, all described <link-to-docs-here>.  Simplest for small amount of data is using a `mongodump` and `mongorestore` executables that are part of MongoDB Tools package. Simply executing `mongodump` will connect to localhost or any connection string you pass to it, and backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are to back up only a specific database or collection. You can then use the `mongorestore` executable to restore a previously made backup. `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
 
 For example, to back up our `learn` database to a `backup` folder, we'd execute (this is its own executable which you run in a command/terminal window, not within the mongo shell itself):
 
-	mongodump --db learn --out backup
+	mongodump --db=learn --out=backup
 
 To restore only the `unicorns` collection, we could then do:
 
-	mongorestore --db learn --collection unicorns backup/learn/unicorns.bson
+	mongorestore --db=learn --collection=unicorns backup/learn/unicorns.bson
 
 It's worth pointing out that `mongoexport` and `mongoimport` are two other executables which can be used to export and import data to/from JSON or CSV. For example, we can get a JSON output by doing:
 
-	mongoexport --db learn --collection unicorns
+	mongoexport --db=learn --collection=unicorns
 
 And a CSV output by doing:
 
@@ -574,10 +503,79 @@ And a CSV output by doing:
 Note that `mongoexport` and `mongoimport` cannot always represent your data fully. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](http://docs.mongodb.org/manual/core/backups/) in the MongoDB Manual.
 
 ## In This Chapter ##
-In this chapter we looked at various commands, tools and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simple to use.
+In this chapter we very briefly listed security best practices and reviewed some basic options for backups.
 
-# Chapter 8 - Security #
-A short chapter on security stuff
+# Chapter 9 - When To Use MongoDB #
+By now you should have a feel for where and how MongoDB might fit into your existing system. There are enough new and competing storage technologies that it's easy to get overwhelmed by all of the choices.
+
+For me, the most important lesson, which has nothing to do with MongoDB, is that you no longer have to rely on a single solution for dealing with your data. No doubt, a single solution has obvious advantages, and for a lot projects - possibly even most - a single solution is the sensible approach. The idea isn't that you *must* use different technologies, but rather that you *can*. Only you know whether the benefits of introducing a new solution outweigh the costs.
+
+With that said, I'm hopeful that what you've seen so far has made you see MongoDB as a general solution. It's been mentioned a couple times that document-oriented databases share a lot in common with relational databases. Therefore, rather than tiptoeing around it, let's simply state that MongoDB should be seen as a direct alternative to relational databases. Where one might see Lucene as enhancing a relational database with full text indexing, or Redis as a persistent key-value store, MongoDB is a central repository for your data.
+
+Notice that I didn't call MongoDB a *replacement* for relational databases, but rather an *alternative*. It's a tool that can do what a lot of other tools can do. Some of it MongoDB does better, some of it MongoDB does worse. Let's dissect things a little further.
+
+## Flexible Schema ##
+An oft-touted benefit of document-oriented database is that they don't enforce a fixed schema. This makes them much more flexible than traditional database tables. I agree that flexible schema is a nice feature, but not for the main reason most people mention.
+
+People talk about "schema-less" as though you'll suddenly start storing a crazy mishmash of data. There are domains and data sets which can really be a pain to model using relational databases, but I see those as edge cases. Schema-less is cool, but most of your data is going to be highly structured. It's true that having an occasional mismatch can be handy, especially when you introduce new features, but in reality it's nothing a nullable column probably wouldn't solve just as well.
+
+For me, the real benefit of dynamic schema is the lack of setup and the reduced friction with OOP. This is particularly true when you're working with a static language. I've worked with MongoDB in both C# and Ruby, and the difference is striking. Ruby's dynamism and its popular ActiveRecord implementations already reduce much of the object-relational impedance mismatch. That isn't to say MongoDB isn't a good match for Ruby, it really is. Rather, I think most Ruby developers would see MongoDB as an incremental improvement, whereas C# or Java developers would see a fundamental shift in how they interact with their data.
+
+Think about it from the perspective of a driver developer. You want to save an object? Serialize it to JSON (technically BSON, but close enough) and send it to MongoDB. There is no property mapping or type mapping. This straightforwardness definitely flows to you, the end developer.
+
+Do keep in mind that MongoDB provides ability to optionally enforce full or partial schema via [schema validation](https://www.mongodb.com/docs/manual/core/schema-validation/). This feature is powerful and lets you specify everything from types of fields required and optional, to ranges of values, and other document constraints.
+
+## Writes ##
+MongoDB allows you to control the write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-connection, per-collection, or per-write, giving you a great level of control over the trade-off between write latency and data durability.
+
+## Special Collections and Indexes ##
+MongoDB also supports many different types of special collections and indexes.
+
+You can create [read-only views](https://www.mongodb.com/docs/manual/core/views/) by defining an aggregation pipeline on an existing collection or view.
+
+If you have data that represents time series, MongoDB supports special [time series collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) type which store sequences of measurements over a period of time.
+
+There are capped collections, which you create with pre-defined size and they automatically truncate old data as new data is appended and reaches the specified maximum size.  Capped collections do have some limitations, so as an alternative, if you want to "expire" your data based on time, you can use [TTL Indexes](http://docs.mongodb.org/manual/tutorial/expire-data/) where TTL stands for "time-to-live".
+
+## Durability ##
+Prior to version 1.8 (released in 2010), MongoDB did not have single-server durability. That is, a server crash would likely result in lost or corrupt data. The solution had always been to run MongoDB in a multi-server setup (MongoDB supports replication). Journaling was one of the major features added in 1.8. Since version 2.0 MongoDB enables journaling by default, which allows fast recovery of the server in case of a crash or abrupt power loss.  As of version 4.0 you no longer even have the option of disabling journaling.
+
+Durability is only mentioned here because a lot has been made around MongoDB's past lack of single-server durability. This'll likely show up in Google searches for some time to come. Information you find about journaling being a missing feature is simply out of date.
+
+## Full Text Search ##
+(AK-TODO mention Atlas search with Lucene?  Two options, depending on Atlas or not) True full text search capability is a recent addition to MongoDB.  It supports fifteen languages with stemming and stop words. With MongoDB's support for arrays and full text search you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    
+
+## Transactions ##
+MongoDB added full support for ACID transactions in 4.0 (extending it to sharded clusters in 4.2). Before that there were two alternatives, one which is great and still has its place, and the other that was cumbersome but flexible.
+
+The first is its many atomic update operations. These are great, so long as they actually address your problem. We already saw some of the simpler ones, like `$inc` and `$set`. There are also commands like `findAndModify` which can update or delete a document and return it atomically.  When atomicity can be ensured this way, it's preferable to using transactions for speed and overall scalability of the system.
+
+The second, when atomic operations aren't enough, was to fall back to a two-phase commit. A two-phase commit is to transactions what manual dereferencing is to joins. It's a storage-agnostic solution that you do in code. Two-phase commits are actually quite popular in the relational world as a way to implement transactions across multiple databases. AK-TODO check AK-TODO The MongoDB website [had an example](http://docs.mongodb.org/manual/tutorial/perform-two-phase-commits/) AK NO LONGER THERE - remove section? illustrating the most typical example (a transfer of funds). The general idea is that you store the state of the transaction within the actual document being updated atomically and go through the init-pending-commit/rollback steps manually.  This is the case where using MongoDB native multi-document transactions is a great option as they significantly simplify the application code.
+
+TODO short paragraph on transaction details?
+
+## Geospatial ##
+A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. This is a feature best explained via some visual aids, so I invite you to try the [5 minute geospatial interactive tutorial](http://mongly.openmymind.net/geo/index), if you want to learn more.  TODO this is not there any longer - is there another feature for this? or can we write one ourselves?)
+
+## Replication ##
+MongoDB replication works in some ways similarly to how relational database replication works. All production deployments should be replica sets, which consist of ideally three or more servers that hold the same data.  Writes are sent to a single server, the primary, from where it's asynchronously replicated to every secondary. You can control whether you allow reads to happen on secondaries or not, which can help direct some special queries away from the primary, at the risk of reading slightly stale data. If the primary goes down, one of the secondaries will be automatically elected to be the new primary. Again, MongoDB replication is outside the scope of this book.
+
+## Sharding ##
+MongoDB supports auto-sharding. Sharding is an approach to scalability which partitions your data across multiple servers or clusters. A naive implementation might put all of the data for users with a name that starts with A-M on server 1 and the rest on server 2. Thankfully, MongoDB's sharding capabilities far exceed such a simple algorithm. Sharding is a topic well beyond the scope of this book, but you should know that it exists and that you should consider it, should your needs grow beyond a single replica set.
+
+While replication can help performance somewhat (by isolating long running queries to secondaries, and reducing latency for some other types of queries), its main purpose is to provide high availability. Sharding is the primary method for scaling MongoDB clusters. Combining replication with sharding is the prescribed approach to achieve scaling and high availability.
+
+
+## Tools and Maturity ##
+You probably already know the answer to this, but MongoDB is obviously younger than most relational database systems. This is absolutely something you should consider, though how much it matters depends on what you are doing and how you are doing it. Nevertheless, an honest assessment simply can't ignore the fact that MongoDB is younger and the available tooling around isn't great (although the tooling around a lot of very mature relational databases is pretty horrible too!). As an example, support for base-10 floating point numbers was only added in version 3.4, and there is still no support for SOMETHING HERE?  AK-TODO TODO 
+
+On the positive side, drivers exist for a great many languages, the protocol is modern and simple, and development is happening at blinding speeds. MongoDB is in production at enough companies that concerns about maturity, while valid, are quickly becoming a thing of the past.
+
+
+## In This Chapter ##
+The message from this chapter is that MongoDB, in most cases, can replace a relational database. It's much simpler and straightforward; it's faster and generally imposes fewer restrictions on application developers. The addition of transactions addressed a legitimate and serious concern. So, when people ask *where does MongoDB sit with respect to the new data storage landscape?* the answer is simple: **right in the middle**.
+
+
 
 # Conclusion #
 You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.org/) has a lot of useful information. The official AK-TODO replace with reference to community site [MongoDB Community Forums](https://www.mongodb.com/community/forums/) are a great place to ask questions.

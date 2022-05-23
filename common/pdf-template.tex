@@ -1,4 +1,4 @@
-\documentclass{book}
+\documentclass[a5paper]{book}
 
 
 % Fonts and typography
@@ -11,9 +11,9 @@
 %% \setmainfont[Ligatures=TeX]{Linux Libertine}
 %% \setmainfont{Helvetica}
 %% \setsansfont{Tahoma}
-\setmainfont{LexendDeca-Light}
-\setsansfont{LexendDeca-Light}
-\setmonofont{SourceCodePro-Medium}
+\setmainfont[Scale=0.82]{LexendDeca-Light}
+\setsansfont[Scale=0.82]{LexendDeca-Light}
+\setmonofont[Scale=0.76]{SourceCodePro-Medium}
 %% \setmonofont{Source Code Pro Medium}
 %% \setmonofont{Courier}
 %% \setmainfont[Ligatures=TeX]{Verdana}
@@ -28,11 +28,18 @@
 \usepackage{polyglossia}
 \setdefaultlanguage{english}
 
+% Avoid pandoc bug when there are lists in the body. 
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 
 % Page
 
 %% Use full page in book style
 \usepackage{fullpage}
+
+%% geometry for smaller margins
+\usepackage[margin=0.6in]{geometry}
 
 %% Set line spacing
 \usepackage{setspace}
@@ -45,6 +52,8 @@
 \let\stdsection\section
 \renewcommand\section{\newpage\stdsection}
 
+%% \paperheight 9in
+%% \paperwidth 7in
 
 % Colors
 
