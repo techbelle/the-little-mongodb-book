@@ -467,7 +467,7 @@ In this chapter we looked at various commands, tools, and performance details of
 # Chapter 8 - Security and Backups #
 
 ## Security ##
-When it was first released, MongoDB did not have security enabled by default. Rather, they relied on the individual installing it to follow security best practices to lock down the data from malicious actors.  A lot has changed, and many default settings now only allow open access to the data from `localhost` after installation.  You should follow [documented best practices](https://www.mongodb.com/docs/manual/security/) to set up appropriate roles, users and permissions.  
+When it was first released, MongoDB did not have security enabled by default. Rather, it relied on the individual performing installation to follow security best practices to lock down the data from malicious actors.  A lot has changed, and many default settings now only allow open access to the data from `localhost` after installation.  You should follow [documented best practices](https://www.mongodb.com/docs/manual/security/) to set up appropriate roles, users and permissions.  
 
 If you're not using MongoDB Atlas, you will need to follow these steps:
 
@@ -482,23 +482,23 @@ If you're not using MongoDB Atlas, you will need to follow these steps:
 When using Atlas, security is already enforced for you, so fewer steps are required. You still must create an admin user and password, and then allow access to your data from specific IP addresses.
 
 ## Backup and Restore ##
-When you have production data, you want to make sure that you back it up on regular basis (as well as restoring it). There are several approaches to doing backups with MongoDB, all described [here](https://www.mongodb.com/docs/manual/core/backups/).  Simplest for a small amount of data is using `mongodump` and `mongorestore` executables that are part of the [MongoDB Tools package](https://www.mongodb.com/try/download/database-tools). Simply executing `mongodump` will connect to localhost or any connection string you pass to it, then backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are to backup only a specific database or collection. You can then use the `mongorestore` executable to restore a previously made backup. Both `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
+When you have production data, you want to make sure that you back it up on regular basis (as well as restoring it). There are several approaches to doing backups with MongoDB, all described [here](https://www.mongodb.com/docs/manual/core/backups/).  In production you will likely use disk level snapshots, but simplest method for a small amount of data is using `mongodump` and `mongorestore` executables that are part of the [MongoDB Tools package](https://www.mongodb.com/try/download/database-tools). Simply executing `mongodump` will connect to localhost or any connection string you pass to it, then backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are to backup only a specific database or collection. You can then use the `mongorestore` executable to restore a previously made backup. Both `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
 
 To demonstrate, we could backup our `learn` database to a `backup` folder, by executing (this is its own executable which you run in a command/terminal window, not within the mongo shell itself):
 
-	mongodump --db=learn --out=backup
+	mongodump -d learn -out backup
 
 To restore only the `unicorns` collection, we could then do:
 
-	mongorestore --db=learn --collection=unicorns backup/learn/unicorns.bson
+	mongorestore -d learn -c unicorns backup/learn/unicorns.bson
 
 It's worth pointing out that `mongoexport` and `mongoimport` are two other executables which can be used to export and import data to/from JSON or CSV. For example, we can get a JSON output by doing:
 
-	mongoexport --db=learn --collection=unicorns
+	mongoexport -d learn -c unicorns
 
 And a CSV output by doing:
 
-	mongoexport --db learn --collection unicorns --csv --fields name,weight,vampires
+	mongoexport -d learn -c unicorns --csv --fields name,weight,vampires
 
 Note that `mongoexport` and `mongoimport` cannot always represent your data fully. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](https://www.mongodb.com/docs/manual/core/backups/) in the MongoDB documentation.
 
@@ -557,10 +557,11 @@ Using transactions in MongoDB is as straight forward as in relational databases.
 ## Geospatial ##
 A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. 
 
-
 ## Replication ##
 MongoDB replication works in some ways similarly to how relational database replication works. All production deployments should be replica sets, which consist of ideally three or more servers that hold the same data.  Writes are sent to a single server, the primary, from where it's asynchronously replicated to every secondary. You can control whether you allow reads to happen on secondaries or not, which can help direct some special queries away from the primary, at the risk of reading slightly stale data. If the primary goes down, one of the secondaries will be automatically elected to be the new primary. Again, MongoDB replication is outside the scope of this book.
 
+## Change Streams ##
+Change streams allow applications to subscribe to real-time data changes.  Under the covers, change streams use MongoDB Server's replication mechanism and aggregation pipeline. Applications can watch all data changes on a single collection, a database, or an entire deployment, and immediately react to them. Because change streams use the aggregation framework, applications can also filter for specific changes or transform the notifications at will.
 
 ## Sharding ##
 MongoDB supports auto-sharding. Sharding is an approach to scalability which partitions your data across multiple servers or clusters. A naive implementation might put all of the data for users with a name that starts with A-M on server 1 and the rest on server 2. Thankfully, MongoDB's sharding capabilities far exceed such a simple algorithm. Sharding is a topic well beyond the scope of this book, but you should know that it exists and that you should consider it, should your needs grow beyond a single replica set.
