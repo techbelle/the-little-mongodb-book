@@ -436,7 +436,7 @@ If we change our query to use an index, we'll see that the winning plan used `IX
 The `explain()` method can be used with any command that could use an index, like `aggregate`, `update`, etc.
 
 ## Stats ##
-You can obtain statistics on a database by typing `db.stats()`. Most of the information deals with the size of your database. You can also get statistics on a collection, say `unicorns`, by typing `db.unicorns.stats()`. Most of this information relates to the size of your collection and its indexes.  If you are using Atlas, there are multiple metrics screens showing you the same stats data in graphical format over time.
+You can obtain statistics on a database by typing `db.stats()`. Most of the information deals with the size of your database. You can also get statistics on a collection named `unicorns`, by typing `db.unicorns.stats()`. Most of this information will relate to the size of your collection and its indexes.  If you are using Atlas, there are multiple metrics screens showing you the same stats data in graphical format over time.
 
 ## Profiler ##
 You can enable the MongoDB profiler by executing:
@@ -451,23 +451,23 @@ And then examine the profiler collection:
 
 	db.system.profile.find()
 
-The output tells us what was run and when, how many documents were scanned, and how much data was returned.
+The output tells us what was run and when, and how many documents were scanned versus returned.
 
 You disable the profiler by calling `setProfilingLevel` again but changing the parameter to `0`. Specifying `1` as the first parameter will profile queries that take more than 100 milliseconds. 100 milliseconds is the default threshold, you can specify a different minimum time, in milliseconds, with a second parameter:
 
 	//profile anything that takes more than 1 second
 	db.setProfilingLevel(1, 1000);
 
-You can specify that only a sampling of all operations should be profiled, but even with that option, profiling should be used very cautiously in production.  More details about profiling and how to use it are in the [MongoDB Manual](https://www.mongodb.com/docs/manual/tutorial/manage-the-database-profiler/).
+You can specify that only a sampling of all operations should be profiled, but even with that option, profiling should be used very cautiously in production.  More details about profiling and how to use it are in the [MongoDB Documentation](https://www.mongodb.com/docs/manual/tutorial/manage-the-database-profiler/).
 
 ## In This Chapter ##
-In this chapter we looked at various commands, tools and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simple to use.
+In this chapter we looked at various commands, tools, and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simpler to use.
 
 
 # Chapter 8 - Security and Backups #
 
 ## Security ##
-When it was first released, MongoDB did not have secure defaults and relied on the person installing it to follow security best practices to lock down the data from malicious actors.  A lot has changed, and many default settings now only allow open access to the data from `localhost` after installation.  You should follow [documented best practices](https://www.mongodb.com/docs/manual/security/) to set up appropriate roles, users and permissions.  If you decided to use Atlas, security has already been enforced for you, and you have to take positive steps like creating admin user and password, and allowing access to your data only from specific IP addresses.
+When it was first released, MongoDB did not have security enabled by default. Rather, they relied on the individual installing it to follow security best practices to lock down the data from malicious actors.  A lot has changed, and many default settings now only allow open access to the data from `localhost` after installation.  You should follow [documented best practices](https://www.mongodb.com/docs/manual/security/) to set up appropriate roles, users and permissions.  
 
 If you're not using MongoDB Atlas, you will need to follow these steps:
 
@@ -477,12 +477,14 @@ If you're not using MongoDB Atlas, you will need to follow these steps:
 - encrypt and protect data
 - limit network exposure
 - (optionally) audit system activity
-- always run the latest version to be sure any known issues are fixed
+- always run the latest version of MongoDB and the driver(s) to be sure any known issues are fixed
+
+When using Atlas, security is already enforced for you, so fewer steps are required. You still must create an admin user and password, and then allow access to your data from specific IP addresses.
 
 ## Backup and Restore ##
-When you have production data, you want to make sure that you back it up on regular basis (as well as testing restoring it). There are several approaches to doing backups with MongoDB, all described [here](https://www.mongodb.com/docs/manual/core/backups/).  Simplest for small amount of data is using `mongodump` and `mongorestore` executables that are part of [MongoDB Tools package](https://www.mongodb.com/docs/database-tools/installation/installation/). Simply executing `mongodump` will connect to localhost or any connection string you pass to it, and backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are to back up only a specific database or collection. You can then use the `mongorestore` executable to restore a previously made backup. `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
+When you have production data, you want to make sure that you back it up on regular basis (as well as restoring it). There are several approaches to doing backups with MongoDB, all described [here](https://www.mongodb.com/docs/manual/core/backups/).  Simplest for a small amount of data is using `mongodump` and `mongorestore` executables that are part of the [MongoDB Tools package](https://www.mongodb.com/try/download/database-tools). Simply executing `mongodump` will connect to localhost or any connection string you pass to it, then backup all of your databases to a `dump` subfolder. You can type `mongodump --help` to see additional options. Common options are to backup only a specific database or collection. You can then use the `mongorestore` executable to restore a previously made backup. Both `mongodump` and `mongorestore` operate on BSON, which is MongoDB's native format.
 
-For example, to back up our `learn` database to a `backup` folder, we'd execute (this is its own executable which you run in a command/terminal window, not within the mongo shell itself):
+To demonstrate, we could backup our `learn` database to a `backup` folder, by executing (this is its own executable which you run in a command/terminal window, not within the mongo shell itself):
 
 	mongodump --db=learn --out=backup
 
@@ -498,7 +500,7 @@ And a CSV output by doing:
 
 	mongoexport --db learn --collection unicorns --csv --fields name,weight,vampires
 
-Note that `mongoexport` and `mongoimport` cannot always represent your data fully. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](http://docs.mongodb.org/manual/core/backups/) in the MongoDB Manual.
+Note that `mongoexport` and `mongoimport` cannot always represent your data fully. Only `mongodump` and `mongorestore` should ever be used for actual backups.  You can read more about [your backup options](https://www.mongodb.com/docs/manual/core/backups/) in the MongoDB documentation.
 
 ## In This Chapter ##
 In this chapter we very briefly listed security best practices and reviewed some basic options for backups.
@@ -513,35 +515,35 @@ With that said, I'm hopeful that what you've seen so far has made you see MongoD
 Notice that I didn't call MongoDB a *replacement* for relational databases, but rather an *alternative*. It's a tool that can do what a lot of other tools can do. Some of it MongoDB does better, some of it MongoDB does worse. Let's dissect things a little further.
 
 ## Flexible Schema ##
-An oft-touted benefit of document-oriented database is that they don't enforce a fixed schema. This makes them much more flexible than traditional database tables. I agree that flexible schema is a nice feature, but not for the main reason most people mention.
+An oft-touted benefit of document-oriented databases is that they don't enforce a fixed schema. This makes them much more flexible than traditional database tables. I agree that flexible schema is a nice feature, but not for the main reason most people mention.
 
 People talk about "schema-less" as though you'll suddenly start storing a crazy mishmash of data. There are domains and data sets which can really be a pain to model using relational databases, but I see those as edge cases. Schema-less is cool, but most of your data is going to be highly structured. It's true that having an occasional mismatch can be handy, especially when you introduce new features, but in reality it's nothing a nullable column probably wouldn't solve just as well.
 
-For me, the real benefit of dynamic schema is the lack of setup and the reduced friction with OOP. This is particularly true when you're working with a static language. I've worked with MongoDB in both C# and Ruby, and the difference is striking. Ruby's dynamism and its popular ActiveRecord implementations already reduce much of the object-relational impedance mismatch. That isn't to say MongoDB isn't a good match for Ruby, it really is. Rather, I think most Ruby developers would see MongoDB as an incremental improvement, whereas C# or Java developers would see a fundamental shift in how they interact with their data.
+For me, the real benefit of dynamic schema is the lack of setup and the reduced friction with OOP. This is particularly true when you're working with a static language. I've worked with MongoDB in both C# and Ruby, and the difference is striking. Ruby's dynamism and its popular ActiveRecord implementations already reduce much of the object-relational impedance mismatch. That isn't to say MongoDB isn't a good match for Ruby, it really is. Rather, I think most Ruby developers would see MongoDB as an incremental improvement, whereas C# or Java developers would see MongoDB as offering a fundamental shift in how they interact with their data.
 
 Think about it from the perspective of a driver developer. You want to save an object? Serialize it to JSON (technically BSON, but close enough) and send it to MongoDB. There is no property mapping or type mapping. This straightforwardness definitely flows to you, the end developer.
 
-Do keep in mind that MongoDB provides ability to optionally enforce full or partial schema via [schema validation](https://www.mongodb.com/docs/manual/core/schema-validation/). This feature is powerful and lets you specify everything from types of fields required and optional, to ranges of values, and other document constraints.
+Do keep in mind that MongoDB provides the ability to optionally enforce full or partial schemas via [schema validation](https://www.mongodb.com/docs/manual/core/schema-validation/). This feature is powerful and lets you specify everything from types of fields, required and optional, ranges of values, and many other document constraints.
 
 ## Writes ##
-MongoDB allows you to control the write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-connection, per-collection, or per-write, giving you a great level of control over the trade-off between write latency and data durability.
+MongoDB allows you to control write behavior with respect to data durability. These settings, in addition to specifying how many servers should get your data before being considered successful, are configurable per-connection, per-collection, or per-write, giving you a great level of control over the trade-off between write latency and data durability. Since MongoDB 5.0, w:majority is the default write setting as it is considered a general best practice.
 
 ## Special Collections and Indexes ##
 MongoDB also supports many different types of special collections and indexes.
 
 You can create [read-only views](https://www.mongodb.com/docs/manual/core/views/) by defining an aggregation pipeline on an existing collection or view.
 
-If you have data that represents time series, MongoDB supports special [time series collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) type which store sequences of measurements over a period of time.
+If you have data that represents time series, MongoDB supports a special [time series collection](https://www.mongodb.com/docs/manual/core/timeseries-collections/) type which stores sequences of measurements over a period of time.
 
-There are capped collections, which you create with pre-defined size and they automatically truncate old data as new data is appended and reaches the specified maximum size.  Capped collections do have some limitations, so as an alternative, if you want to "expire" your data based on time, you can use [TTL Indexes](http://docs.mongodb.org/manual/tutorial/expire-data/) where TTL stands for "time-to-live".
+There are capped collections, which you create with pre-defined size. These collection automatically truncate old data as new data is appended and once they reach the specified maximum size.  Capped collections do have some limitations, so as an alternative, if you want to "expire" your data based on time, you can use [TTL Indexes](http://docs.mongodb.org/manual/tutorial/expire-data/) where TTL stands for "time-to-live".
 
 ## Durability ##
-Prior to version 1.8 (released in 2010), MongoDB did not have single-server durability. That is, a server crash would likely result in lost or corrupt data. The solution had always been to run MongoDB in a multi-server setup (MongoDB supports replication). Journaling was one of the major features added in 1.8. Since version 2.0 MongoDB enables journaling by default, which allows fast recovery of the server in case of a crash or abrupt power loss. As of version 4.0 you no longer even have the option of disabling journaling.
+Prior to version 1.8 (released in 2010), MongoDB did not have single-server durability. That is, a server crash would likely result in lost or corrupt data. The solution had always been to run MongoDB in a multi-server setup (MongoDB supports replication). Journaling was one of the major features added in 1.8. Since version 2.0, MongoDB enables journaling by default, which allows fast recovery of the server in case of a crash or abrupt power loss. As of version 4.0, you no longer even have the option of disabling journaling.
 
-Durability is only mentioned here because a lot has been made around MongoDB's past lack of single-server durability. This may still show up in Google searches. Information you find about journaling being a missing feature is simply out of date.
+Durability is only mentioned here because a lot has been made around MongoDB's previous lack of single-server durability. This may still show up in Google searches. Information you find about journaling being a missing feature is simply out of date.
 
 ## Full Text Search ##
-True full text search capability is a relatively recent addition to MongoDB.  Text indexes in the server support fifteen languages with stemming and stop words. In MongoDB Atlas, there's full text search built on top of Apache Lucene open source search engine.  With MongoDB's support for arrays and full text search you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    
+True full text search capability is a relatively recent addition to MongoDB.  Text indexes in the server support fifteen languages with stemming and stop words. In MongoDB Atlas, there's full text search built on top of the Apache Lucene open source search engine.  With MongoDB's support for arrays and full text search, you will only need to look to other solutions if you need a more powerful and full-featured full text search engine.    
 
 ## Transactions ##
 MongoDB added full support for [ACID transactions](https://www.mongodb.com/docs/manual/core/transactions/) in 4.0 (extending it to sharded clusters in 4.2). Before that there were two alternatives, one which is great and still has its place, and the other that was cumbersome but flexible.
@@ -555,8 +557,10 @@ Using transactions in MongoDB is as straight forward as in relational databases.
 ## Geospatial ##
 A particularly powerful feature of MongoDB is its support for [geospatial indexes](http://docs.mongodb.org/manual/applications/geospatial-indexes/). This allows you to store either geoJSON or x and y coordinates within documents and then find documents that are `$geoNear` a set of coordinates or `$geoWithin` a box or circle. 
 
+
 ## Replication ##
 MongoDB replication works in some ways similarly to how relational database replication works. All production deployments should be replica sets, which consist of ideally three or more servers that hold the same data.  Writes are sent to a single server, the primary, from where it's asynchronously replicated to every secondary. You can control whether you allow reads to happen on secondaries or not, which can help direct some special queries away from the primary, at the risk of reading slightly stale data. If the primary goes down, one of the secondaries will be automatically elected to be the new primary. Again, MongoDB replication is outside the scope of this book.
+
 
 ## Sharding ##
 MongoDB supports auto-sharding. Sharding is an approach to scalability which partitions your data across multiple servers or clusters. A naive implementation might put all of the data for users with a name that starts with A-M on server 1 and the rest on server 2. Thankfully, MongoDB's sharding capabilities far exceed such a simple algorithm. Sharding is a topic well beyond the scope of this book, but you should know that it exists and that you should consider it, should your needs grow beyond a single replica set.
@@ -574,8 +578,7 @@ On the positive side, drivers exist for a great many languages, the protocol is 
 The message from this chapter is that MongoDB, in most cases, can replace a relational database. It's much simpler and straightforward; it's faster and generally imposes fewer restrictions on application developers. The addition of transactions addressed a legitimate and serious concern. So, when people ask *where does MongoDB sit with respect to the new data storage landscape?* the answer is simple: **right in the middle**.
 
 
-
 # Conclusion #
-You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.org/) has a lot of useful information. The official community site [MongoDB Community Forums](https://www.mongodb.com/community/forums/) is a great place to ask questions.
+You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.com/) has a lot of useful information. The official community site [MongoDB Community Forums](https://www.mongodb.com/community/forums/) is a great place to ask questions.
 
 NoSQL was born not only out of necessity, but also out of an interest in trying new approaches. It is an acknowledgment that our field is ever-advancing and that if we don't try, and sometimes fail, we can never succeed. This, I think, is a good way to lead our professional lives.
