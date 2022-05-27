@@ -307,10 +307,10 @@ There are other powerful pipeline operator which allow you to transform values o
 This just barely scratches the surface of what you can do with aggregations.  Aggregation is how you can do limited joins in MongoDB via the `$lookup` stage, as well as transitive closure expressions via recursive lookup called `$graphLookup`.  You can also combine data from multiple pipelines using `$unionWith` - somewhat analogous with SQL UNION.
 
 ## Aggregation Output ##
-Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 3) or it can write your results into a new collection using the `$out` pipeline operator. Using `$merge` pipeline stage you can output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents. You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  For more extensive collection of examples, take a look at [Practical MongoDB Aggregations eBook](https://www.practical-mongodb-aggregations.com/). Keep in mind that both Compass GUI and Atlas web-based UI include an aggregation pipeline builder to help you write and debug powerful pipelines.
+Aggregate command return either a cursor to the result set (which you already know how to work with from Chapter 3) or it can write your results into a new collection using the `$out` pipeline operator. Using `$merge` pipeline stage you can output to an existing collection with powerful controls that let you specify exactly how the new output is merged with existing documents. You can see a lot more examples as well as all of the supported pipeline and expression operators in the [MongoDB manual](http://docs.mongodb.org/manual/core/aggregation-pipeline/).  For more extensive collection of examples, take a look at the [Practical MongoDB Aggregations eBook](https://www.practical-mongodb-aggregations.com/). Keep in mind that both Compass GUI and the Atlas web-based UI include an aggregation pipeline builder to help you write and debug powerful pipelines, and that often MongoDB drivers include aggregation builder helpers (Java and .Net/C# driver, for example).
 
 ## In This Chapter ##
-In this chapter we covered MongoDB's [aggregation capabilities](http://docs.mongodb.org/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group and analyze data. With addition of user defined functions, its capabilities can be as boundless as any code you can write in JavaScript.
+In this chapter we covered MongoDB's [aggregation capabilities](https://www.mongodb.com/docs/manual/aggregation/).  Aggregation Pipeline is relatively simple to write once you understand how it's structured and it's a powerful way to group and analyze data. With addition of user defined functions, its capabilities can be as boundless as any code you can write in JavaScript.
 
 # Chapter 5 - Data Modeling #
 Let's shift gears and have a more abstract conversation about MongoDB. Explaining a few new terms and some new syntax is a trivial task. Having a conversation about modeling with a new paradigm isn't as easy. The truth is that most of us are still finding out what works and what doesn't when it comes to modeling with these new technologies. It's a conversation we can start having, but ultimately you'll have to practice and learn on real code.
@@ -373,7 +373,7 @@ Yet another alternative to using joins is to denormalize your data. Historically
 
 For example, say you are writing a forum application. The traditional way to associate a specific `user` with a `post` is via a `userid` column within `posts`. With such a model, you can't display `posts` without retrieving (joining to) `users`. A possible alternative is simply to store the `name` as well as the `userid` with each `post`. You could even do so with an embedded document, like `user: {id: ObjectId('Something'), name: 'Karl'}`. Yes, if you let users change their name, you may have to update each document (which is one multi-update).
 
-Adjusting to this kind of approach won't come easy to some. In a lot of cases it won't even make sense to do this. Don't be afraid to experiment with this approach though. It's not only suitable in some circumstances, but it can also be the best way to do it.
+Adjusting to this kind of approach won't come easy to some. In a lot of cases, it won't even make sense. Don't be afraid to experiment with this approach though. It's not only suitable in some circumstances, but it can also be the best way to do things.
 
 ## Which Should You Choose? ##
 Arrays of ids can be a useful strategy when dealing with one-to-many or many-to-many scenarios. But more commonly, new developers are left deciding between using embedded documents versus doing "manual" referencing.
@@ -395,13 +395,13 @@ The conversation gets even more interesting when you consider embedded documents
 There's no hard rule (well, aside from 16MB). Play with different approaches and you'll get a sense of what does and does not feel right.
 
 ## In This Chapter ##
-Our goal in this chapter was to provide some helpful guidelines for modeling your data in MongoDB, a starting point, if you will. Modeling in a document-oriented system is different, but not too different, than in a relational world. You have more flexibility and one constraint, but for a new system, things tend to fit quite nicely. The only way you can go wrong is by not trying.
+Our goal in this chapter was to provide some helpful guidelines for modeling your data in MongoDB - a starting point, if you will. Modeling in a document-oriented system is different, but not too different, than in a relational world. You have more flexibility and one constraint, but for a new system, things tend to fit quite nicely. The only way you can go wrong is by not trying.
 
 # Chapter 6 - Performance #
-In this chapter, we look at a few performance topics as well as some of the tools available to MongoDB developers. We won't dive deeply into either topic, but we will examine the most important aspects of each.
+In this chapter, we look at a few performance topics as well as some of the tools available to MongoDB developers. We won't dive deeply into these topics, but we will examine the most important aspects of each.
 
 ## Indexes ##
-At the very beginning we saw the `getIndexes` command which shows information on all the indexes in a collection. Indexes in MongoDB work a lot like indexes in a relational database: they help improve query and sorting performance. Indexes are created via `createIndex`:
+At the very beginning we discussed the `getIndexes` command which shows information on all the indexes in a collection. Indexes in MongoDB work a lot like indexes in a relational database: they help improve query and sorting performance. Indexes are created via `createIndex`:
 
 	// where "name" is the field name
 	db.unicorns.createIndex({name: 1});
@@ -420,7 +420,7 @@ Indexes can be created on embedded fields (again, using the dot-notation) and on
 
 The direction of your index (1 for ascending, -1 for descending) doesn't matter for a single key index, but it can make a difference for compound indexes when you are sorting on more than one indexed field.
 
-The [indexes page](http://docs.mongodb.org/manual/indexes/) has additional information on indexes.  You can create indexes in the shell, or use the UI provided by Compass or Atlas.
+The [indexes page](https://www.mongodb.com/docs/manual/indexes/) has additional information on indexes.  You can create indexes in the shell, or use the UI provided by Compass or Atlas.
 
 ## Explain ##
 To see whether or not your queries are using an index, you can use the `explain` method:
@@ -436,10 +436,10 @@ If we change our query to use an index, we'll see that the winning plan used `IX
 The `explain()` method can be used with any command that could use an index, like `aggregate`, `update`, etc.
 
 ## Stats ##
-You can obtain statistics on a database by typing `db.stats()`. Most of the information deals with the size of your database. You can also get statistics on a collection named `unicorns`, by typing `db.unicorns.stats()`. Most of this information will relate to the size of your collection and its indexes.  If you are using Atlas, there are multiple metrics screens showing you the same stats data in graphical format over time.
+Obtain statistics on a MongoDB database by typing `db.stats()`. Most of the information deals with the size of your database. Statistics are also available per collection - for a collection named `unicorns`, typing `db.unicorns.stats()` will do the trick. Most of this information will relate to the size of your collection and its indexes.  If you are using Atlas, there are multiple metrics screens showing you the same stats data in graphical format over time.
 
 ## Profiler ##
-You can enable the MongoDB profiler by executing:
+MongoDB also has database profiling functionality - the output tells us what was run and when, and how many documents were scanned versus returned. You can enable the MongoDB profiler by executing:
 
 	db.setProfilingLevel(2);
 
@@ -451,14 +451,12 @@ And then examine the profiler collection:
 
 	db.system.profile.find()
 
-The output tells us what was run and when, and how many documents were scanned versus returned.
-
 You disable the profiler by calling `setProfilingLevel` again but changing the parameter to `0`. Specifying `1` as the first parameter will profile queries that take more than 100 milliseconds. 100 milliseconds is the default threshold, you can specify a different minimum time, in milliseconds, with a second parameter:
 
 	//profile anything that takes more than 1 second
 	db.setProfilingLevel(1, 1000);
 
-You can specify that only a sampling of all operations should be profiled, but even with that option, profiling should be used very cautiously in production.  More details about profiling and how to use it are in the [MongoDB Documentation](https://www.mongodb.com/docs/manual/tutorial/manage-the-database-profiler/).
+You can specify that only a sampling of all operations should be profiled, but even with sampling enabled, database profiling should be used very cautiously in production.  More details about profiling and how to use it are in the [MongoDB Documentation](https://www.mongodb.com/docs/manual/tutorial/manage-the-database-profiler/).
 
 ## In This Chapter ##
 In this chapter we looked at various commands, tools, and performance details of using MongoDB. We haven't touched on everything, but we've looked at some of the common ones. Indexing in MongoDB is similar to indexing with relational databases, as are many of the tools. However, with MongoDB, many of these are to the point and simpler to use.
@@ -561,7 +559,7 @@ A particularly powerful feature of MongoDB is its support for [geospatial indexe
 MongoDB replication works in some ways similarly to how relational database replication works. All production deployments should be replica sets, which consist of ideally three or more servers that hold the same data.  Writes are sent to a single server, the primary, from where it's asynchronously replicated to every secondary. You can control whether you allow reads to happen on secondaries or not, which can help direct some special queries away from the primary, at the risk of reading slightly stale data. If the primary goes down, one of the secondaries will be automatically elected to be the new primary. Again, MongoDB replication is outside the scope of this book.
 
 ## Change Streams ##
-Change streams allow applications to subscribe to real-time data changes.  Under the covers, change streams use MongoDB Server's replication mechanism and aggregation pipeline. Applications can watch all data changes on a single collection, a database, or an entire deployment, and immediately react to them. Because change streams use the aggregation framework, applications can also filter for specific changes or transform the notifications at will.
+Change streams allow applications to subscribe to real-time data changes.  Under the covers, change streams use MongoDB server replication and the aggregation pipeline. Applications can watch all data changes on a single collection, a database, or an entire deployment, and immediately react to them. Because change streams use the aggregation framework, applications can also filter for specific changes or transform the notifications at will.
 
 ## Sharding ##
 MongoDB supports auto-sharding. Sharding is an approach to scalability which partitions your data across multiple servers or clusters. A naive implementation might put all of the data for users with a name that starts with A-M on server 1 and the rest on server 2. Thankfully, MongoDB's sharding capabilities far exceed such a simple algorithm. Sharding is a topic well beyond the scope of this book, but you should know that it exists and that you should consider it, should your needs grow beyond a single replica set.
