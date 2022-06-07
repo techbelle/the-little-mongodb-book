@@ -7,7 +7,7 @@ The book was written by [Karl Seguin](http://openmymind.net), with [Perry Neal](
 
 If you liked this book, maybe you'll also like [The Little Redis Book](http://openmymind.net/2012/1/23/The-Little-Redis-Book/).
 
-The book was updated for MongoDB 2.6 by [Asya Kamsky](https://twitter.com/asya999)
+The book was updated for MongoDB 6.0 by [Asya Kamsky](https://twitter.com/asya999)
 
 ## Translations ##
 
